@@ -1,7 +1,7 @@
-
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 
+# 헬퍼 클래스
 class UserManager(BaseUserManager):
     def create_user(self, email, password, **kwargs):
         if not email:
@@ -22,7 +22,7 @@ class UserManager(BaseUserManager):
         superuser.is_staff = True
         superuser.is_superuser = True
         superuser.is_active = True
-        
+
         superuser.save(using=self._db)
         return superuser
 
