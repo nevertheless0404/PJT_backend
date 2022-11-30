@@ -9,4 +9,4 @@ class ProjectSerializer(serializers.ModelSerializer):
 class TodoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Todo
-        fields = "__all__"
+        fields = '__all__'
