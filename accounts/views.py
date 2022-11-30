@@ -9,13 +9,16 @@ from django.shortcuts import render, get_object_or_404
 from project.settings import SECRET_KEY
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.parsers import JSONParser
 
 class RegisterAPIView(APIView):
     def post(self, request):
-        serializer = UserSerializer(data=request.data)
+        request_data = JSONParser().parse(request)
+        serializer = UserSerializer(data=request_data)
+
         if serializer.is_valid():
             user = serializer.save()
-            
+
             # jwt 토큰 접근
             token = TokenObtainPairSerializer.get_token(user)
             refresh_token = str(token)
@@ -31,12 +34,13 @@ class RegisterAPIView(APIView):
                 },
                 status=status.HTTP_200_OK,
             )
-            
+
             # jwt 토큰 => 쿠키에 저장
             res.set_cookie("access", access_token, httponly=True)
             res.set_cookie("refresh", refresh_token, httponly=True)
-            
+
             return res
+
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class AuthAPIView(APIView):
