@@ -20,6 +20,10 @@ urlpatterns =[
     path('project/<int:pk>/', views.Projectdetail.as_view()),
     path('todo/', views.Todolist.as_view()),
     path('todo/<int:pk>/', views.Tododetail.as_view()),
+    path('ptoj/', views.Ptoj.as_view()),
+    path('info/', views.Informslist.as_view()), 
+    path('info/create/', views.Informspost.as_view()),
+    path('info/<int:pk>/', views.Informs.as_view()),
 ]
 
-urlpatterns = format_suffix_patterns(urlpatterns)
+urlpatterns = format_suffix_patterns(urlpatterns)   

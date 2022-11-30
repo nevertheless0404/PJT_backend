@@ -20,3 +20,8 @@ class Todo(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name= 'todo_project')
     start_at = models.DateTimeField()
     end_at = models.DateTimeField()
+    complete = models.IntegerField(default=0)
+
+class Informs(models.Model):
+    content = models.CharField(max_length=150)
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name= 'info_project')

@@ -1,23 +1,7 @@
 from django.shortcuts import render
-from .models import Project, Todo
-from .serializers import ProjectSerializer, TodoSerializer
-from rest_framework import viewsets
-
-# Create your views here.
-# class ProjectViewSet(viewsets.ModelViewSet):
-#     queryset = Project.objects.all()
-#     serializer_class = ProjectSerializer
-
-# class TodoViewSet(viewsets.ModelViewSet):
-#     queryset = Todo.objects.all()
-#     serializer_class = TodoSerializer
-
-
-# 데이터 처리
-from .models import Project, Todo
-from .serializers import ProjectSerializer, TodoSerializer
-
-# APIView를 사용하기 위해 import
+from .models import Project, Todo, Informs
+from .serializers import ProjectSerializer, TodoSerializer, InformsSerializer
+from django.contrib.auth import get_user_model
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -25,12 +9,14 @@ from django.http import Http404
 
 # project의 목록을 보여주는 역할
 class Projectlist(APIView):
-    # project list를 보여줄 때
+    # project list를 보여줄 때``
     def get(self, request):
         projects = Project.objects.all()
         # 여러 개의 객체를 serialization하기 위해 many=True로 설정
         serializer = ProjectSerializer(projects, many=True)
         return Response(serializer.data)
+
+    
 
     # 새로운 project 글을 작성할 때
     def post(self, request):
@@ -124,4 +110,66 @@ class Tododetail(APIView):
     def delete(self, request, pk, format=None):
         todo = self.get_object(pk)
         todo.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+
+
+class Ptoj(APIView):
+    def get(self, request):
+            mytodo = Todo.objects.filter(user=request.user)
+            serializer1 = TodoSerializer(mytodo, many=True)
+            return Response(serializer1.data)
+
+
+
+# todo의 목록을 보여주는 역할
+class Todolist(APIView):
+    # todo list를 보여줄 때
+    def get(self, request):
+        todos = Todo.objects.all()
+        # 여러 개의 객체를 serialization하기 위해 many=True로 설정
+        serializer = TodoSerializer(todos, many=True)
+        return Response(serializer.data)
+
+
+class Informslist(APIView):
+
+    def get(self, request):
+        inform = Informs.objects.all()
+        serializer = InformsSerializer(inform, many=True)
+        return Response(serializer.data)
+
+
+class Informspost(APIView):
+    def post(self, request):
+        serializer = InformsSerializer(data=request.data)
+        if serializer.is_valid(): 
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class Informs(APIView):
+    def get_object(self, pk):
+        try:
+            return Informs.objects.get(pk=pk)
+        except Informs.DoesNotExist:
+            raise Http404
+    
+    def get(self, request, pk, format=None):
+        inform = self.get_object(pk)
+        serializer = InformsSerializer(inform)
+        return Response(serializer.data)
+
+    def put(self, request, pk, format=None):
+        inform = self.get_object(pk)
+        serializer = InformsSerializer(inform, data=request.data) 
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data) 
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk, format=None):
+        inform = self.get_object(pk)
+        inform.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
