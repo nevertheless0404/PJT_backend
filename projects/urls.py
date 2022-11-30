@@ -1,4 +1,5 @@
 from django.urls import path, include
+
 # from .views import ProjectViewSet, TodoViewSet
 from rest_framework.routers import DefaultRouter
 
@@ -15,15 +16,15 @@ from rest_framework.routers import DefaultRouter
 from rest_framework.urlpatterns import format_suffix_patterns
 from . import views
 
-urlpatterns =[
-    path('project/', views.Projectlist.as_view()),
-    path('project/<int:pk>/', views.Projectdetail.as_view()),
-    path('todo/', views.Todolist.as_view()),
-    path('todo/<int:pk>/', views.Tododetail.as_view()),
-    path('ptoj/', views.Ptoj.as_view()),
-    path('info/', views.Informslist.as_view()), 
-    path('info/create/', views.Informspost.as_view()),
-    path('info/<int:pk>/', views.Informs.as_view()),
+urlpatterns = [
+    path("project/", views.Projectlist.as_view()),
+    path("project/<int:pk>/", views.Projectdetail.as_view()),
+    path("todo/", views.Todolist.as_view()),
+    path("todo/<int:pk>/", views.Tododetail.as_view()),
+    path("ptoj/", views.Ptoj.as_view()),
+    path("informs/", views.Informslist.as_view()),
+    path("informs/create/", views.Informspost.as_view()),
+    path("informs/<int:pk>/", views.Informsdetail.as_view()),
 ]
 
-urlpatterns = format_suffix_patterns(urlpatterns)   
+urlpatterns = format_suffix_patterns(urlpatterns)
