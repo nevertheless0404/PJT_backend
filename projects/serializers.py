@@ -1,4 +1,4 @@
-from .models import Project, Todo
+from .models import Project, Todo, Informs
 from rest_framework import serializers
 
 class ProjectSerializer(serializers.ModelSerializer):
@@ -9,4 +9,9 @@ class ProjectSerializer(serializers.ModelSerializer):
 class TodoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Todo
+        fields = '__all__'
+
+class InformsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Informs
         fields = '__all__'
