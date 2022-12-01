@@ -39,13 +39,11 @@ class Projectlist(APIView):
         serializer = ProjectSerializer(data=request.data)
         if serializer.is_valid():  # 유효성 검사
             serializer.save()  # 저장
-            print(type(serializer.data['id']))
-            project = Project.objects.get(pk=serializer.data['id'])
-            Members.objects.create(user=request.user, leader=1, project=project )
-            
+            print(type(serializer.data["id"]))
+            project = Project.objects.get(pk=serializer.data["id"])
+            Members.objects.create(user=request.user, leader=1, project=project)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 
 
 # project의 detail을 보여주는 역할
@@ -61,7 +59,6 @@ class Projectdetail(APIView):
     def get(self, request, pk, format=None):
         project = self.get_object(pk)
         serializer = ProjectSerializer(project)
-        
         return Response(serializer.data)
 
     # project 수정하기
@@ -138,7 +135,6 @@ class Ptoj(APIView):
 
 
 # todo의 목록을 보여주는 역할
-
 class Todolist(APIView):
     # todo list를 보여줄 때
     def get(self, request):
@@ -164,7 +160,6 @@ class Informslist(APIView):
 
 
 # 공지사항 디테일
-
 class Informsdetail(APIView):
     def get_object(self, pk):
         try:
@@ -192,7 +187,6 @@ class Informsdetail(APIView):
 
 
 class Membersadm(APIView):
-    
     def get(self, request, pk):
         members = Members.objects.filter(project_id=pk)
         serializer = MembersSerializer(members, many=True)
