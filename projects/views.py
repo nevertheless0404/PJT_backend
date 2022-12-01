@@ -17,7 +17,13 @@ from django.shortcuts import redirect, get_object_or_404
 class Projectlist(APIView):
     # project list를 보여줄 때``
     def get(self, request):
-        projects = Project.objects.all()
+        print(request.user)
+        members = Members.objects.filter(user=request.user)
+        projects = []
+        for member in members:
+            print(member.project.pk)
+            project = Project.objects.get(pk=member.project.pk)
+            projects.append(project)
         # 여러 개의 객체를 serialization하기 위해 many=True로 설정
         serializer = ProjectSerializer(projects, many=True)
         return Response(serializer.data)
@@ -121,6 +127,7 @@ class Ptoj(APIView):
 
 
 # todo의 목록을 보여주는 역할
+
 class Todolist(APIView):
     # todo list를 보여줄 때
     def get(self, request):
@@ -144,6 +151,7 @@ class Informslist(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 # 공지사항 디테일
+
 class Informsdetail(APIView):
     def get_object(self, pk):
         try:
@@ -169,24 +177,9 @@ class Informsdetail(APIView):
         inform.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-# @api_view(['POST'])
-# def Membersadm(request, pk):
-
-#     members = Members.objects.filter(project_id = pk)
-#     if request.method == 'POST':
-#         member = MembersSerializer(data=request.data)
-#         print('===================================')
-#         if member.is_valid():
-#             print(member)
-#             print('===================================')
-#             member.save()
-#             print('1111111111111111111111111111111111111')
-#             return Response(member.data)
-#     else:
-#         return Response(member.errors, status=status.HTTP_400_BAD_REQUEST)
-
 
 class Membersadm(APIView):
+    
     def get(self, request, pk):
         members = Members.objects.filter(project_id = pk)
         serializer = MembersSerializer(members, many=True)
