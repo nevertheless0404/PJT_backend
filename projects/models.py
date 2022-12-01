@@ -26,6 +26,6 @@ class Informs(models.Model):
 
 
 class Members(models.Model):
-    project = models.ForeignKey(Project, on_delete=models.CASCADE)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, null=True)
+    user = models.CharField(max_length=100)
     leader = models.BooleanField(default=False)
