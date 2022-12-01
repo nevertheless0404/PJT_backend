@@ -1,10 +1,15 @@
 from django.shortcuts import render
-from .models import Project, Todo, Informs,  Members
+from .models import Project, Todo, Informs, Members
 from accounts.models import User
 from rest_framework.decorators import api_view
 from rest_framework.parsers import JSONParser
 
-from .serializers import ProjectSerializer, TodoSerializer, InformsSerializer, MembersSerializer
+from .serializers import (
+    ProjectSerializer,
+    TodoSerializer,
+    InformsSerializer,
+    MembersSerializer,
+)
 from django.contrib.auth import get_user_model
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -142,6 +147,7 @@ class Todolist(APIView):
         serializer = TodoSerializer(todos, many=True)
         return Response(serializer.data)
 
+
 # 공지사랑 리스트 생성
 class Informslist(APIView):
     def get(self, request):
@@ -155,6 +161,7 @@ class Informslist(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 # 공지사항 디테일
 
@@ -187,7 +194,7 @@ class Informsdetail(APIView):
 class Membersadm(APIView):
     
     def get(self, request, pk):
-        members = Members.objects.filter(project_id = pk)
+        members = Members.objects.filter(project_id=pk)
         serializer = MembersSerializer(members, many=True)
         return Response(serializer.data)
 
