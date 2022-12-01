@@ -194,14 +194,7 @@ class Membersadm(APIView):
 
     def post(self, request, pk):
         serializer = MembersSerializer(data=request.data)
-        print('rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr')
         if serializer.is_valid():
-            # member = JSONParser().parse(serializer.data)
-            # print(member)
-            # member = serializer.data.user
-            # Members.objects.create(project_id=pk, user=member)
             serializer.save()
-            print(serializer.data)
-            serializer.data
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

@@ -19,4 +19,4 @@ class InformsSerializer(serializers.ModelSerializer):
 class MembersSerializer(serializers.ModelSerializer):
     class Meta:
         model = Members
-        fields = ['user']
+        fields = ['user','project']
