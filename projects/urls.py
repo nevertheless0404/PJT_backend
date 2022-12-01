@@ -23,8 +23,8 @@ urlpatterns = [
     path("todo/<int:pk>/", views.Tododetail.as_view()),
     path("ptoj/", views.Ptoj.as_view()),
     path("informs/", views.Informslist.as_view()),
-    path("informs/create/", views.Informspost.as_view()),
     path("informs/<int:pk>/", views.Informsdetail.as_view()),
+    path('memberadmin/<int:pk>/', views.Membersadm),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)

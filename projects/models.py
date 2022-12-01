@@ -10,8 +10,6 @@ class Project(models.Model):
     goal = models.CharField(max_length=50)
     skill = models.TextField()
     functions = models.TextField()
-    leader = models.CharField(max_length=20)
-    members = models.TextField()
 
 class Todo(models.Model):
     title = models.CharField(max_length=30)
@@ -25,3 +23,9 @@ class Todo(models.Model):
 class Informs(models.Model):
     content = models.CharField(max_length=150)
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name= 'info_project')
+
+
+class Members(models.Model):
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    leader = models.BooleanField(default=False)
