@@ -1,11 +1,15 @@
 from django.shortcuts import render
-from .models import Project, Todo, Informs
-from .serializers import ProjectSerializer, TodoSerializer, InformsSerializer
+from .models import Project, Todo, Informs,  Members
+from accounts.models import User
+from rest_framework.decorators import api_view
+
+from .serializers import ProjectSerializer, TodoSerializer, InformsSerializer, MembersSerializer
 from django.contrib.auth import get_user_model
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from django.http import Http404
+from django.shortcuts import redirect, get_object_or_404
 
 # project의 목록을 보여주는 역할
 class Projectlist(APIView):
@@ -123,15 +127,13 @@ class Todolist(APIView):
         serializer = TodoSerializer(todos, many=True)
         return Response(serializer.data)
 
-
+# 공지사랑 리스트 생성
 class Informslist(APIView):
     def get(self, request):
         inform = Informs.objects.all()
         serializer = InformsSerializer(inform, many=True)
         return Response(serializer.data)
 
-
-class Informspost(APIView):
     def post(self, request):
         serializer = InformsSerializer(data=request.data)
         if serializer.is_valid():
@@ -139,7 +141,7 @@ class Informspost(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
+# 공지사항 디테일
 class Informsdetail(APIView):
     def get_object(self, pk):
         try:
@@ -164,3 +166,16 @@ class Informsdetail(APIView):
         inform = self.get_object(pk)
         inform.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+@api_view(['POST'])
+def Membersadm(request, pk):
+
+    members = Members.objects.filter(project = pk)
+    if request.method == 'POST':
+        member = MembersSerializer(data=request.data)
+        if not member.user in members.user_id:
+            if member.is_vaild():
+                member.save()
+                return Response(member.data)
+    else:
+        raise NameError
