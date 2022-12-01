@@ -2,11 +2,13 @@ from django.shortcuts import render
 from .models import Project, Todo, Informs,  Members
 from accounts.models import User
 from rest_framework.decorators import api_view
+from rest_framework.parsers import JSONParser
 
 from .serializers import ProjectSerializer, TodoSerializer, InformsSerializer, MembersSerializer
 from django.contrib.auth import get_user_model
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from django.http import HttpResponse, JsonResponse
 from rest_framework import status
 from django.http import Http404
 from django.shortcuts import redirect, get_object_or_404
@@ -167,15 +169,39 @@ class Informsdetail(APIView):
         inform.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-@api_view(['POST'])
-def Membersadm(request, pk):
+# @api_view(['POST'])
+# def Membersadm(request, pk):
 
-    members = Members.objects.filter(project = pk)
-    if request.method == 'POST':
-        member = MembersSerializer(data=request.data)
-        if not member.user in members.user_id:
-            if member.is_vaild():
-                member.save()
-                return Response(member.data)
-    else:
-        raise NameError
+#     members = Members.objects.filter(project_id = pk)
+#     if request.method == 'POST':
+#         member = MembersSerializer(data=request.data)
+#         print('===================================')
+#         if member.is_valid():
+#             print(member)
+#             print('===================================')
+#             member.save()
+#             print('1111111111111111111111111111111111111')
+#             return Response(member.data)
+#     else:
+#         return Response(member.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class Membersadm(APIView):
+    def get(self, request, pk):
+        members = Members.objects.filter(project_id = pk)
+        serializer = MembersSerializer(members, many=True)
+        return Response(serializer.data)
+
+    def post(self, request, pk):
+        serializer = MembersSerializer(data=request.data)
+        print('rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr')
+        if serializer.is_valid():
+            # member = JSONParser().parse(serializer.data)
+            # print(member)
+            # member = serializer.data.user
+            # Members.objects.create(project_id=pk, user=member)
+            serializer.save()
+            print(serializer.data)
+            serializer.data
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
