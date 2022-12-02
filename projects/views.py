@@ -77,6 +77,19 @@ class Projectdetail(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+# @api_view(["POST"])
+# def changeleader(request, project_pk, leader_pk, format=None):
+#     if request.method == "POST":
+#         project = Project.objects.get(pk=project_pk)
+#         if request.user == project.user:
+#             new = User.objects.get(pk=leader_pk)
+#             project = Project(user=new)
+#             print(project)
+#             project.save()
+#             return Response("변경 성공!", status=status.HTTP_201_CREATED)
+#     return Response("변경 실패!", status=status.HTTP_400_BAD_REQUEST)
+
+
 # todo의 목록을 보여주는 역할
 class Todolist(APIView):
     # todo list를 보여줄 때
