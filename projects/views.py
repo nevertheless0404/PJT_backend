@@ -44,13 +44,11 @@ class Projectlist(APIView):
         serializer = ProjectSerializer(data=request.data)
         if serializer.is_valid():  # 유효성 검사
             serializer.save()  # 저장
-            print(type(serializer.data['id']))
-            project = Project.objects.get(pk=serializer.data['id'])
-            Members.objects.create(user=request.user, leader=1, project=project )
-
+            print(type(serializer.data["id"]))
+            project = Project.objects.get(pk=serializer.data["id"])
+            Members.objects.create(user=request.user, leader=1, project=project)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 
 
 # project의 detail을 보여주는 역할
@@ -66,7 +64,6 @@ class Projectdetail(APIView):
     def get(self, request, pk, format=None):
         project = self.get_object(pk)
         serializer = ProjectSerializer(project)
-
         return Response(serializer.data)
 
     # project 수정하기
@@ -83,6 +80,32 @@ class Projectdetail(APIView):
         project = self.get_object(pk)
         project.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+@api_view(["POST"])
+def changeleader(request, project_pk, leader_pk, format=None):
+    if request.method == "POST":
+        members = Members.objects.get(pk=project_pk)
+        nowleader = 0
+        for member in members:
+            if member.leader == 1:
+                nowleader = member
+                break
+        if request.user == nowleader.user:
+            new = User.objects.get(pk=leader_pk)
+            newleader = 0
+            for member in members:
+                if member.user == new.email:
+                    member.leader = 1
+                    member.save()
+                    break
+            return Response("변경 성공!", status=status.HTTP_201_CREATED)
+        
+            # new = User.objects.get(pk=leader_pk)
+            # project = Project(user=new)
+            # print(project)
+            # project.save()
+    return Response("변경 실패!", status=status.HTTP_400_BAD_REQUEST)
 
 
 # todo의 목록을 보여주는 역할
@@ -159,7 +182,6 @@ class Informslist(APIView):
 
 
 # 공지사항 디테일
-
 class Informsdetail(APIView):
     def get_object(self, pk):
         try:
@@ -187,7 +209,6 @@ class Informsdetail(APIView):
 
 
 class Membersadm(APIView):
-
     def get(self, request, pk):
         members = Members.objects.filter(project_id=pk)
         serializer = MembersSerializer(members, many=True)
