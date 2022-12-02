@@ -55,6 +55,13 @@ INSTALLED_APPS = [
     'corsheaders',
 ]
 
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        # 'rest_framework.permissions.AllowAny', # 지정해주지않으면, Default로 AllowAny가 적용
+        # 'rest_framework.permissions.IsAuthenticated',
+    ],
+}
+
 REST_USE_JWT = True
 JWT_AUTH_COOKIE = 'my-app-auth'
 JWT_AUTH_REFRESH_COOKIE = 'my-refresh-token'
@@ -112,10 +119,10 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-CORS_ALLOWED_ORIGINS = [
+CORS_ORIGIN_WHITELIST = [
 	# 허용할 Origin 추가
     "http://localhost:8080",
-    "http://127.0.0.1:8080"
+    "http://172.30.1.40:8080"
 ]
 
 ROOT_URLCONF = "project.urls"

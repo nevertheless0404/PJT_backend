@@ -1,4 +1,4 @@
-from .models import Project, Todo, Informs, Members
+from .models import Project, Todo, Informs, Members, Comment
 from rest_framework import serializers
 
 class ProjectSerializer(serializers.ModelSerializer):
@@ -20,3 +20,8 @@ class MembersSerializer(serializers.ModelSerializer):
     class Meta:
         model = Members
         fields = ['user','project']
+
+class CommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = ['id', 'comment',]
