@@ -77,17 +77,30 @@ class Projectdetail(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-# @api_view(["POST"])
-# def changeleader(request, project_pk, leader_pk, format=None):
-#     if request.method == "POST":
-#         project = Project.objects.get(pk=project_pk)
-#         if request.user == project.user:
-#             new = User.objects.get(pk=leader_pk)
-#             project = Project(user=new)
-#             print(project)
-#             project.save()
-#             return Response("변경 성공!", status=status.HTTP_201_CREATED)
-#     return Response("변경 실패!", status=status.HTTP_400_BAD_REQUEST)
+@api_view(["POST"])
+def changeleader(request, project_pk, leader_pk, format=None):
+    if request.method == "POST":
+        members = Members.objects.get(pk=project_pk)
+        nowleader = 0
+        for member in members:
+            if member.leader == 1:
+                nowleader = member
+                break
+        if request.user == nowleader.user:
+            new = User.objects.get(pk=leader_pk)
+            newleader = 0
+            for member in members:
+                if member.user == new.email:
+                    member.leader = 1
+                    member.save()
+                    break
+            return Response("변경 성공!", status=status.HTTP_201_CREATED)
+        
+            # new = User.objects.get(pk=leader_pk)
+            # project = Project(user=new)
+            # print(project)
+            # project.save()
+    return Response("변경 실패!", status=status.HTTP_400_BAD_REQUEST)
 
 
 # todo의 목록을 보여주는 역할
