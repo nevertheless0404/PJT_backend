@@ -1,7 +1,8 @@
 from django.shortcuts import render
-from .models import Project, Todo, Informs, Members
+from .models import Project, Todo, Informs, Members, Comment
 from accounts.models import User
 from rest_framework.decorators import api_view
+from rest_framework import viewsets
 from rest_framework.parsers import JSONParser
 
 from .serializers import (
@@ -9,6 +10,7 @@ from .serializers import (
     TodoSerializer,
     InformsSerializer,
     MembersSerializer,
+    CommentSerializer,
 )
 from django.contrib.auth import get_user_model
 from rest_framework.views import APIView
@@ -17,9 +19,12 @@ from django.http import HttpResponse, JsonResponse
 from rest_framework import status
 from django.http import Http404
 from django.shortcuts import redirect, get_object_or_404
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 
 # project의 목록을 보여주는 역할
 class Projectlist(APIView):
+    permissions_classes = [IsAuthenticated]
+
     # project list를 보여줄 때``
     def get(self, request):
         print(request.user)
@@ -39,13 +44,11 @@ class Projectlist(APIView):
         serializer = ProjectSerializer(data=request.data)
         if serializer.is_valid():  # 유효성 검사
             serializer.save()  # 저장
-            print(type(serializer.data['id']))
-            project = Project.objects.get(pk=serializer.data['id'])
-            Members.objects.create(user=request.user, leader=1, project=project )
-            
+            print(type(serializer.data["id"]))
+            project = Project.objects.get(pk=serializer.data["id"])
+            Members.objects.create(user=request.user, leader=1, project=project)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 
 
 # project의 detail을 보여주는 역할
@@ -61,7 +64,6 @@ class Projectdetail(APIView):
     def get(self, request, pk, format=None):
         project = self.get_object(pk)
         serializer = ProjectSerializer(project)
-        
         return Response(serializer.data)
 
     # project 수정하기
@@ -80,8 +82,35 @@ class Projectdetail(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+@api_view(["POST"])
+def changeleader(request, project_pk, leader_pk, format=None):
+    if request.method == "POST":
+        members = Members.objects.get(pk=project_pk)
+        nowleader = 0
+        for member in members:
+            if member.leader == 1:
+                nowleader = member
+                break
+        if request.user == nowleader.user:
+            new = User.objects.get(pk=leader_pk)
+            newleader = 0
+            for member in members:
+                if member.user == new.email:
+                    member.leader = 1
+                    member.save()
+                    break
+            return Response("변경 성공!", status=status.HTTP_201_CREATED)
+        
+            # new = User.objects.get(pk=leader_pk)
+            # project = Project(user=new)
+            # print(project)
+            # project.save()
+    return Response("변경 실패!", status=status.HTTP_400_BAD_REQUEST)
+
+
 # todo의 목록을 보여주는 역할
 class Todolist(APIView):
+    permissions_classes = [IsAuthenticated]
     # todo list를 보여줄 때
     def get(self, request):
         todos = Todo.objects.all()
@@ -101,6 +130,7 @@ class Todolist(APIView):
 
 # todo의 detail을 보여주는 역할
 class Tododetail(APIView):
+    permissions_classes = [IsAuthenticated]
     # todo 객체 가져오기
     def get_object(self, pk):
         try:
@@ -136,18 +166,6 @@ class Ptoj(APIView):
         serializer1 = TodoSerializer(mytodo, many=True)
         return Response(serializer1.data)
 
-
-# todo의 목록을 보여주는 역할
-
-class Todolist(APIView):
-    # todo list를 보여줄 때
-    def get(self, request):
-        todos = Todo.objects.all()
-        # 여러 개의 객체를 serialization하기 위해 many=True로 설정
-        serializer = TodoSerializer(todos, many=True)
-        return Response(serializer.data)
-
-
 # 공지사랑 리스트 생성
 class Informslist(APIView):
     def get(self, request):
@@ -164,7 +182,6 @@ class Informslist(APIView):
 
 
 # 공지사항 디테일
-
 class Informsdetail(APIView):
     def get_object(self, pk):
         try:
@@ -192,7 +209,6 @@ class Informsdetail(APIView):
 
 
 class Membersadm(APIView):
-    
     def get(self, request, pk):
         members = Members.objects.filter(project_id=pk)
         serializer = MembersSerializer(members, many=True)
@@ -204,3 +220,30 @@ class Membersadm(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+def comment(request, todo_pk):
+    serializer = CommentSerializer(data=request.data)
+    comments = Comment.objects.filter(todo_id=todo_pk)
+    serializer = CommentSerializer(comments, many=True)
+    return Response(serializer.data)
+
+@api_view(['POST'])
+def comment_create(request, todo_pk):
+    serializer = CommentSerializer(data=request.data)
+    todo = get_object_or_404(Todo, pk=todo_pk)
+    if serializer.is_valid(raise_exception=True):
+        serializer.save(todo=todo)
+        return Response(serializer.data)
+
+@api_view(['PUT','DELETE'])
+def comment_update_and_delete(request, todo_pk, comment_pk):
+    comment = get_object_or_404(Comment, pk=comment_pk)
+    if request.method == 'PUT':
+        serializer = CommentSerializer(data=request.data, instance=comment)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return Response({'message':'Comment has been updated!'})
+    else:
+        comment.delete()
+    return Response({'message':'Comment has been deleted!'})
