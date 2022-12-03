@@ -68,22 +68,33 @@ class Projectdetail(APIView):
     # project의 detail 보기
     def get(self, request, pk, format=None):
         project = self.get_object(pk)
-        serializer = ProjectSerializer(project)
-        return Response(serializer.data)
+        members = Members.objects.filter(project=project.pk)
+        for member in members:
+            print('다영사랑해 다영사랑해 다영사랑해')
+            if member.user == request.user.email:
+                serializer = ProjectSerializer(project)
+            return Response(serializer.data)
 
     # project 수정하기
     def put(self, request, pk, format=None):
         project = self.get_object(pk)
         serializer = ProjectSerializer(project, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
+        members = Members.objects.filter(project=project.pk)
+        for member in members:
+            print('다영사랑해 다영사랑해 다영사랑해')
+            if member.user == request.user.email:
+                if serializer.is_valid():
+                    serializer.save()
+                    return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     # project 삭제하기
     def delete(self, request, pk, format=None):
         project = self.get_object(pk)
-        project.delete()
+        members = Members.objects.filter(project=project.pk)
+        for member in members:
+            if member.user == request.user.email:
+                project.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
