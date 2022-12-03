@@ -304,3 +304,4 @@ def comment_update_and_delete(request, project_pk, todo_pk, comment_pk):
     else:
         comment.delete()
     return Response({'message':'Comment has been deleted!'})
+
