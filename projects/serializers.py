@@ -14,9 +14,9 @@ class TodoSerializer(serializers.ModelSerializer):
 class InformsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Informs
-        fields = '__all__'
+        fields = ['content']
 
 class MembersSerializer(serializers.ModelSerializer):
     class Meta:
         model = Members
-        fields = ['user','project']
+        fields = ['user']

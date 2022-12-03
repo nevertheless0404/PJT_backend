@@ -22,7 +22,7 @@ urlpatterns = [
     path("todo/", views.Todolist.as_view()),
     path("todo/<int:pk>/", views.Tododetail.as_view()),
     path("ptoj/", views.Ptoj.as_view()),
-    path("informs/", views.Informslist.as_view()),
+    path("informs/<int:pk>/", views.Informslist.as_view()),
     path("informs/<int:pk>/", views.Informsdetail.as_view()),
     path("memberadmin/<int:pk>/", views.Membersadm.as_view()),
     path("change/<int:project_pk>/<int:leader_pk>/", views.changeleader),
