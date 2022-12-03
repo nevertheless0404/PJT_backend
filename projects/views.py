@@ -168,16 +168,25 @@ class Ptoj(APIView):
 
 # 공지사랑 리스트 생성
 class Informslist(APIView):
-    def get(self, request):
-        inform = Informs.objects.all()
+    def get(self, request, pk):
+        inform = Informs.objects.filter(project=pk)
         serializer = InformsSerializer(inform, many=True)
         return Response(serializer.data)
 
-    def post(self, request):
-        serializer = InformsSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+    def post(self, request, pk):
+        teamleader = 0
+        leaders = Members.objects.filter(project=pk)
+        for lead in leaders:
+            if lead.leader == 1:
+                teamleader = lead
+                break
+        if request.user.email == lead.user:
+            serializer = InformsSerializer(data=request.data)
+            project = Project.objects.get(pk=pk)
+            if serializer.is_valid():
+                serializer.validated_data['project'] = project
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -215,11 +224,18 @@ class Membersadm(APIView):
         return Response(serializer.data)
 
     def post(self, request, pk):
-        serializer = MembersSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        project = Project.objects.get(pk=pk)
+        print(request.data)
+        for dt in request.data:
+            print(dt)
+            serializer = MembersSerializer(data=dt)
+            if serializer.is_valid():
+                # serializer.validated_data['project'] = project
+                # print(serializer.validated_data)
+                serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    
+        # return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
 def comment(request, todo_pk):

@@ -25,7 +25,7 @@ urlpatterns = [
     path("todo/<int:todo_pk>/comments/create/", views.comment_create),
     path("todo/<int:todo_pk>/comments/<int:comment_pk>/", views.comment_update_and_delete),
     path("ptoj/", views.Ptoj.as_view()),
-    path("informs/", views.Informslist.as_view()),
+    path("informs/<int:pk>/", views.Informslist.as_view()),
     path("informs/<int:pk>/", views.Informsdetail.as_view()),
     path("memberadmin/<int:pk>/", views.Membersadm.as_view()),
     path("change/<int:project_pk>/<int:leader_pk>/", views.changeleader),
