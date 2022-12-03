@@ -9,7 +9,7 @@ class ProjectSerializer(serializers.ModelSerializer):
 class TodoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Todo
-        fields = '__all__'
+        fields = ["id","title","start_at","end_at","content"]
 
 class InformsSerializer(serializers.ModelSerializer):
     class Meta:
