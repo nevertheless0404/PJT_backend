@@ -352,7 +352,7 @@ class Commentdetail(APIView):
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    # comment 삭제하기
+    # comment 삭제하기 #
     def delete(self, request, project_pk, todo_pk, comment_pk, format=None):
         comment = Comment.objects.get(project_id=project_pk, todo_id=todo_pk, pk=comment_pk)
         if comment.user == request.user:
