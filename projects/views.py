@@ -41,13 +41,18 @@ class Projectlist(APIView):
     # 새로운 project 글을 작성할 때
     def post(self, request):
         # request.data는 사용자의 입력 데이터
-        serializer = ProjectSerializer(data=request.data)
-        if serializer.is_valid():  # 유효성 검사
-            serializer.save()  # 저장
-            print(type(serializer.data["id"]))
-            project = Project.objects.get(pk=serializer.data["id"])
-            Members.objects.create(user=request.user, leader=1, project=project)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        if request.user != 0:
+            serializer = ProjectSerializer(data=request.data)
+            if serializer.is_valid():  # 유효성 검사
+                serializer.validated_data['user'] = request.user
+                serializer.save()  # 저장
+                print("==============================================")
+                print(serializer.data['id'])
+                project = Project.objects.get(pk=serializer.data['id'])
+                Members.objects.create(user=request.user, leader=1, project=project)
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -230,7 +235,7 @@ class Membersadm(APIView):
             print(dt)
             serializer = MembersSerializer(data=dt)
             if serializer.is_valid():
-                # serializer.validated_data['project'] = project
+                serializer.validated_data['project'] = project
                 # print(serializer.validated_data)
                 serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)

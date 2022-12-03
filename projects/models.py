@@ -10,7 +10,6 @@ class Project(models.Model):
     goal = models.CharField(max_length=50)
     skill = models.TextField()
     functions = models.TextField()
-    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
 class Todo(models.Model):
     title = models.CharField(max_length=30)

@@ -4,7 +4,7 @@ from rest_framework import serializers
 class ProjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Project
-        fields = '__all__'
+        fields = ["id","title","start_at","end_at","goal","skill","functions"]
 
 class TodoSerializer(serializers.ModelSerializer):
     class Meta:
