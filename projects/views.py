@@ -44,14 +44,13 @@ class Projectlist(APIView):
         if request.user != 0:
             serializer = ProjectSerializer(data=request.data)
             if serializer.is_valid():  # 유효성 검사
-                serializer.validated_data['user'] = request.user
+                serializer.validated_data["user"] = request.user
                 serializer.save()  # 저장
                 print("==============================================")
-                print(serializer.data['id'])
-                project = Project.objects.get(pk=serializer.data['id'])
+                print(serializer.data["id"])
+                project = Project.objects.get(pk=serializer.data["id"])
                 Members.objects.create(user=request.user, leader=1, project=project)
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
-
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -70,7 +69,7 @@ class Projectdetail(APIView):
         project = self.get_object(pk)
         members = Members.objects.filter(project=project.pk)
         for member in members:
-            print('다영사랑해 다영사랑해 다영사랑해')
+            print("다영사랑해 다영사랑해 다영사랑해")
             if member.user == request.user.email:
                 serializer = ProjectSerializer(project)
             return Response(serializer.data)
@@ -82,7 +81,7 @@ class Projectdetail(APIView):
         members = Members.objects.filter(project=project.pk)
         lead = 0
         for member in members:
-            print('다영사랑해 다영사랑해 다영사랑해')
+            print("다영사랑해 다영사랑해 다영사랑해")
             if member.leader == 1:
                 lead = member
                 if lead.user == request.user.email:
@@ -122,15 +121,18 @@ def changeleader(request, project_pk, leader_pk, format=None):
                 break
         if request.user == nowleader.user:
             new = User.objects.get(pk=leader_pk)
-            newleader = 0
-            for member in members:
-                if member.user == new.email:
-                    member.leader = 1
-                    member.save()
-                    break
+            nowleader.email = new.email
+            serializer = MembersSerializer(data=nowleader)
+            print(serializer)
+            if serializer.is_valid():
+                serializer.save()
+            # for member in members:
+            #     if member.user == new.email:
+            #         member.leader = 1
+            #         member.save()
+            #         break
             return Response("변경 성공!", status=status.HTTP_201_CREATED)
             # new = User.objects.get(pk=leader_pk)
-            # project = Project(user=new)
             # print(project)
             # project.save()
     return Response("변경 실패!", status=status.HTTP_400_BAD_REQUEST)
@@ -160,8 +162,8 @@ class Todolist(APIView):
         for member in members:
             if request.user.email == member.user:
                 if serializer.is_valid():  # 유효성 검사
-                    serializer.validated_data['project'] = project
-                    serializer.validated_data['user'] = request.user
+                    serializer.validated_data["project"] = project
+                    serializer.validated_data["user"] = request.user
                     serializer.save()  # 저장
                     return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -211,6 +213,7 @@ class Ptoj(APIView):
         serializer1 = TodoSerializer(mytodo, many=True)
         return Response(serializer1.data)
 
+
 # 공지사랑 리스트 생성
 class Informslist(APIView):
     def get(self, request, pk):
@@ -229,7 +232,7 @@ class Informslist(APIView):
             serializer = InformsSerializer(data=request.data)
             project = Project.objects.get(pk=pk)
             if serializer.is_valid():
-                serializer.validated_data['project'] = project
+                serializer.validated_data["project"] = project
                 serializer.save()
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -275,12 +278,13 @@ class Membersadm(APIView):
             print(dt)
             serializer = MembersSerializer(data=dt)
             if serializer.is_valid():
-                serializer.validated_data['project'] = project
+                serializer.validated_data["project"] = project
                 # print(serializer.validated_data)
                 serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         # return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 # comment의 목록을 보여주는 역할
@@ -358,3 +362,4 @@ class Commentdetail(APIView):
         if comment.user == request.user:
             comment.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
