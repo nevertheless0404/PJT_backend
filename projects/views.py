@@ -100,6 +100,13 @@ class Projectdetail(APIView):
                 lead = member
                 if lead.user == request.user.email:
                     project.delete()
+        members = Members.objects.filter(project=project.pk)
+        lead = 0
+        for member in members:
+            if member.leader == 1:
+                lead = member
+                if lead.user == request.user.email:
+                    project.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -138,11 +145,10 @@ class Todolist(APIView):
     def get(self, request, project_pk):
         project = Project.objects.get(pk=project_pk)
         members = Members.objects.filter(project=project)
-        print(members)
         for member in members:
             if request.user.email == member.user:
-                todos = Todo.objects.filter(project=project)
-                # 여러 개의 객체를 serialization하기 위해 many=True로 설정
+                todos = Todo.objects.filter(project_id=project_pk)
+        # 여러 개의 객체를 serialization하기 위해 many=True로 설정
                 serializer = TodoSerializer(todos, many=True)
                 return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -167,27 +173,26 @@ class Todolist(APIView):
 class Tododetail(APIView):
     permissions_classes = [IsAuthenticated]
     # todo 객체 가져오기
-    def get_object(self, project_pk, pk):
+    def get_object(self, project_pk, todo_pk):
+        print(project_pk, todo_pk)
         try:
-            return Todo.objects.get(pk=pk)
+            return Todo.objects.get(project_id=project_pk, pk=todo_pk)
         except Todo.DoesNotExist:
             raise Http404
 
     # todo의 detail 보기
-    def get(self, request, project_pk, pk, format=None):
-        project = Project.objects.get(pk=project_pk)
+    def get(self, request, project_pk, todo_pk, format=None):
+        todo = self.get_object(project_pk, todo_pk)
         serializer = TodoSerializer(data=request.data)
-        members = Members.objects.filter(project=project)
-        for member in members:
-            if request.user.email == member.user:
-                todo = self.get_object(pk)
-                serializer = TodoSerializer(todo)
-                return Response(serializer.data)
+        # members = Members.objects.filter(project=project)
+        # for member in members:
+        #     if request.user.email == member.user:
+        serializer = TodoSerializer(todo)
+        return Response(serializer.data)
 
     # todo 수정하기
-    def put(self, request, project_pk, pk, format=None):
-        project = Project.objects.get(pk=project_pk)
-        todo = self.get_object(pk)
+    def put(self, request, project_pk, todo_pk, format=None):
+        todo = self.get_object(project_pk, todo_pk)
         serializer = TodoSerializer(todo, data=request.data)
         if todo.user == request.user:
             if serializer.is_valid():
@@ -196,11 +201,11 @@ class Tododetail(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     # todo 삭제하기
-    def delete(self, request, project_pk, pk, format=None):
-        todo = self.get_object(pk)
-        todo.delete()
+    def delete(self, request, project_pk, todo_pk, format=None):
+        todo = self.get_object(project_pk, todo_pk)
+        if todo.user == request.user:
+            todo.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-
 
 class Ptoj(APIView):
     def get(self, request):
@@ -281,31 +286,80 @@ class Membersadm(APIView):
         # return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(["GET"])
-def comment(request, project_pk, todo_pk):
-    serializer = CommentSerializer(data=request.data)
-    comments = Comment.objects.filter(todo_id=todo_pk)
-    serializer = CommentSerializer(comments, many=True)
-    return Response(serializer.data)
 
+# comment의 목록을 보여주는 역할
+class Commentlist(APIView):
+    permissions_classes = [IsAuthenticated]
 
-@api_view(["POST"])
-def comment_create(request, project_pk, todo_pk):
-    serializer = CommentSerializer(data=request.data)
-    todo = get_object_or_404(Todo, pk=todo_pk)
-    if serializer.is_valid(raise_exception=True):
-        serializer.save(todo=todo)
+    # comment list를 보여줄 때``
+    def get(self, request, project_pk, todo_pk):
+        comments = Comment.objects.filter(project_id=project_pk, todo_id=todo_pk)
+        # 여러 개의 객체를 serialization하기 위해 many=True로 설정
+        serializer = CommentSerializer(comments, many=True)
         return Response(serializer.data)
 
+    # 새로운 comment를 작성할 때
+    def post(self, request, project_pk, todo_pk):
+        # request.data는 사용자의 입력 데이터
+        serializer = CommentSerializer(data=request.data)
+        # todo = get_object_or_404(Todo, pk=todo_pk, project_id=project_pk)
+        project = Project.objects.get(pk=project_pk)
+        todo = Todo.objects.get(pk=todo_pk)
+        if serializer.is_valid():  # 유효성 검사
+            serializer.validated_data['user'] = request.user
+            serializer.validated_data['project'] = project
+            serializer.validated_data['todo'] = todo
+            serializer.save()  # 저장
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-@api_view(["PUT", "DELETE"])
-def comment_update_and_delete(request, project_pk, todo_pk, comment_pk):
-    comment = get_object_or_404(Comment, pk=comment_pk)
-    if request.method == "PUT":
-        serializer = CommentSerializer(data=request.data, instance=comment)
-        if serializer.is_valid(raise_exception=True):
+
+# comemnt의 detail을 보여주는 역할
+class Commentdetail(APIView):
+    # comment 객체 가져오기
+    def get_object(self, request, project_pk, todo_pk, comment_pk):
+        try:
+            return Comment.objects.get(project_id=project_pk, todo_id=todo_pk, pk=comment_pk)
+        except Project.DoesNotExist:
+            raise Http404
+
+    # comment의 detail 보기
+    def get(self, request, project_pk, todo_pk, comment_pk, format=None):
+        print(project_pk, todo_pk, comment_pk)
+        comment = Comment.objects.get(project_id=project_pk, todo_id=todo_pk, pk=comment_pk)
+        serializer = CommentSerializer(comment)
+        return Response(serializer.data)
+
+    # 새로운 recomment를 작성할 때
+    def post(self, request, project_pk, todo_pk, comment_pk):
+        # request.data는 사용자의 입력 데이터
+        serializer = CommentSerializer(data=request.data)
+        # todo = get_object_or_404(Todo, pk=todo_pk, project_id=project_pk)
+        project = Project.objects.get(pk=project_pk)
+        todo = Todo.objects.get(pk=todo_pk)
+        comment = Comment.objects.get(pk=comment_pk)
+        if serializer.is_valid():  # 유효성 검사
+            serializer.validated_data['user'] = request.user
+            serializer.validated_data['parent'] = comment
+            serializer.validated_data['project'] = project
+            serializer.validated_data['todo'] = todo
+            serializer.save()  # 저장
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    # comment 수정하기
+    def put(self, request, project_pk, todo_pk, comment_pk, format=None):
+        comment = Comment.objects.get(project_id=project_pk, todo_id=todo_pk, pk=comment_pk)
+        serializer = CommentSerializer(comment, data=request.data)
+        if serializer.is_valid():
             serializer.save()
-            return Response({"message": "Comment has been updated!"})
-    else:
-        comment.delete()
-    return Response({"message": "Comment has been deleted!"})
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    # comment 삭제하기 #
+    def delete(self, request, project_pk, todo_pk, comment_pk, format=None):
+        comment = Comment.objects.get(project_id=project_pk, todo_id=todo_pk, pk=comment_pk)
+        if comment.user == request.user:
+            comment.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
