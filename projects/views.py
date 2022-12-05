@@ -100,25 +100,9 @@ class Projectdetail(APIView):
                 lead = member
                 if lead.user == request.user.email:
                     project.delete()
-        members = Members.objects.filter(project=project.pk)
-        lead = 0
-        for member in members:
-            if member.leader == 1:
-                lead = member
-                if lead.user == request.user.email:
-                    project.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    def delete(self, request, pk, format=None):
-        project = self.get_object(pk)
-        members = Members.objects.filter(project=project.pk)
-        lead = 0
-        for member in members:
-            if not member.leader == 1:
-                lead = member
-                if lead.user == request.user.email:
-                    project.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+    
 
 
 # 리더 권한 넘겨주기
@@ -324,6 +308,15 @@ class Membersadmdetail(APIView):
             dele = True
         if dele == True:
             member.delete()
+        le = 0
+        for j in members:
+            if j.leader == 1:
+                le = 1
+        if le == 0:
+            for j in members:
+                j.leader = 1
+        print(members)
+
         return Response(status=status.HTTP_204_NO_CONTENT)
                     
 
