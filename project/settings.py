@@ -60,18 +60,15 @@ REST_FRAMEWORK = {
         # 'rest_framework.permissions.AllowAny', # 지정해주지않으면, Default로 AllowAny가 적용
         # 'rest_framework.permissions.IsAuthenticated',
     ],
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
+    )
 }
 
 REST_USE_JWT = True
-JWT_AUTH_COOKIE = 'my-app-auth'
-JWT_AUTH_REFRESH_COOKIE = 'my-refresh-token'
+# JWT_AUTH_COOKIE = 'my-app-auth'
+# JWT_AUTH_REFRESH_COOKIE = 'my-refresh-token'
 
-AUTHENTICATION_BACKENDS = (
-    'django.contrib.auth.backends.ModelBackend',
-    'allauth.account.auth_backends.AuthenticationBackend',
-)
-
-SITE_ID = 6
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 ACCOUNT_USERNAME_REQUIRED = False
@@ -87,26 +84,26 @@ environ.Env.read_env(
     env_file = os.path.join(BASE_DIR, '.env')
 )
 
-SOCIALACCOUNT_PROVIDERS = {
-"google": {
-    # For each OAuth based provider, either add a ``SocialApp``
-    # (``socialaccount`` app) containing the required client
-    # credentials, or list them here:
-    "APP": {
-        "client_id": env('SOCIAL_AUTH_GOOGLE_CLIENT_ID'),
-        "secret": env('SOCIAL_AUTH_GOOGLE_SECRET'),
-        "key": env('key'),
-    },
-    # These are provider-specific settings that can only be
-    # listed here:
-    "SCOPE": [
-        "profile",
-        "email",
-    ],
-    "AUTH_PARAMS": {
-        "access_type": "online",
-    }
-}}
+# SOCIALACCOUNT_PROVIDERS = {
+# "google": {
+#     # For each OAuth based provider, either add a ``SocialApp``
+#     # (``socialaccount`` app) containing the required client
+#     # credentials, or list them here:
+#     "APP": {
+#         "client_id": env('SOCIAL_AUTH_GOOGLE_CLIENT_ID'),
+#         "secret": env('SOCIAL_AUTH_GOOGLE_SECRET'),
+#         "key": env('key'),
+#     },
+#     # These are provider-specific settings that can only be
+#     # listed here:
+#     "SCOPE": [
+#         "profile",
+#         "email",
+#     ],
+#     "AUTH_PARAMS": {
+#         "access_type": "online",
+#     }
+# }}
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
@@ -124,7 +121,8 @@ CORS_ORIGIN_WHITELIST = [
     "http://localhost:8080",
     "http://127.0.0.1:8080",
     "http://192.168.0.6:8080",
-    "http://172.30.1.40:8080"
+    "http://172.30.1.40:8080",
+    "http://172.30.1.22:8080"
 ]
 
 ROOT_URLCONF = "project.urls"
