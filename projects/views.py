@@ -106,7 +106,7 @@ class Projectdetail(APIView):
 
 
 # 리더 권한 넘겨주기
-@api_view(["GET"])
+@api_view(["GET", "POST"])
 def changeleader(request, project_pk, leader_pk, format=None):
     if request.method == "GET":
         # 프로젝트 가져옴
@@ -128,7 +128,6 @@ def changeleader(request, project_pk, leader_pk, format=None):
             nowleader.save()
         return Response("변경 성공!", status=status.HTTP_201_CREATED)
     return Response("변경 실패!", status=status.HTTP_400_BAD_REQUEST)
-
 
 # todo의 목록을 보여주는 역할
 class Todolist(APIView):
@@ -260,6 +259,7 @@ class Informsdetail(APIView):
         inform.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+
 # 멤버 추가
 class Membersadm(APIView):
     def get(self, request, pk):
@@ -276,20 +276,21 @@ class Membersadm(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 class Membersadmdetail(APIView):
-    def get_object(self,project_pk, pk):
+    def get_object(self, project_pk, pk):
         try:
             return Members.objects.get(pk=pk)
         except Members.DoesNotExist:
             raise Http404
-    def get(self, request,project_pk, pk, format=None):
+
+    def get(self, request, project_pk, pk, format=None):
         member = self.get_object(project_pk, pk)
         serializer = MembersSerializer(member)
-        
+
         return Response(serializer.data)
 
-    
-    def delete(self, request,project_pk, pk, format=None):
+    def delete(self, request, project_pk, pk, format=None):
         member = self.get_object(project_pk, pk)
         project = Project.objects.get(pk=project_pk)
         members = Members.objects.filter(project=project)
@@ -320,8 +321,6 @@ class Membersadmdetail(APIView):
         print(members)
 
         return Response(status=status.HTTP_204_NO_CONTENT)
-                    
-
 
 
 # comment의 목록을 보여주는 역할
