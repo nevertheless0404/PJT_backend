@@ -27,11 +27,10 @@ class Projectlist(APIView):
 
     # project list를 보여줄 때``
     def get(self, request):
-        print(request.user)
         members = Members.objects.filter(user=request.user)
         projects = []
         for member in members:
-            print(member.project.pk)
+            # 참여하는 프젝만 보여짐
             project = Project.objects.get(pk=member.project.pk)
             projects.append(project)
         # 여러 개의 객체를 serialization하기 위해 many=True로 설정
@@ -44,11 +43,11 @@ class Projectlist(APIView):
         if request.user != 0:
             serializer = ProjectSerializer(data=request.data)
             if serializer.is_valid():  # 유효성 검사
+                # 유저 추가해주기
                 serializer.validated_data["user"] = request.user
                 serializer.save()  # 저장
-                print("==============================================")
-                print(serializer.data["id"])
                 project = Project.objects.get(pk=serializer.data["id"])
+                # 멤버스 안에 만든사람 db에 저장하기
                 Members.objects.create(user=request.user, leader=1, project=project)
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
 
@@ -67,9 +66,9 @@ class Projectdetail(APIView):
     # project의 detail 보기
     def get(self, request, pk, format=None):
         project = self.get_object(pk)
+        # 멤버스에 있는 사람만 디테일 볼 수 있음
         members = Members.objects.filter(project=project.pk)
         for member in members:
-            print("다영사랑해 다영사랑해 다영사랑해")
             if member.user == request.user.email:
                 serializer = ProjectSerializer(project)
             return Response(serializer.data)
@@ -78,10 +77,10 @@ class Projectdetail(APIView):
     def put(self, request, pk, format=None):
         project = self.get_object(pk)
         serializer = ProjectSerializer(project, data=request.data)
+        # 팀장인 사람만 project수정 가능
         members = Members.objects.filter(project=project.pk)
         lead = 0
         for member in members:
-            print("다영사랑해 다영사랑해 다영사랑해")
             if member.leader == 1:
                 lead = member
                 if lead.user == request.user.email:
@@ -93,6 +92,7 @@ class Projectdetail(APIView):
     # project 삭제하기
     def delete(self, request, pk, format=None):
         project = self.get_object(pk)
+        # 팀장만 project 삭제 가능
         members = Members.objects.filter(project=project.pk)
         lead = 0
         for member in members:
@@ -109,7 +109,7 @@ class Projectdetail(APIView):
                     project.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-
+# 손봐야댐 나중에 봐야지 메롱메롱
 @api_view(["POST"])
 def changeleader(request, project_pk, leader_pk, format=None):
     if request.method == "POST":
@@ -144,24 +144,26 @@ class Todolist(APIView):
     # todo list를 보여줄 때
     def get(self, request, project_pk):
         project = Project.objects.get(pk=project_pk)
+        # 프젝에 있는 유저면 볼 수 있음
         members = Members.objects.filter(project=project)
         for member in members:
             if request.user.email == member.user:
+                # 그 프젝의 할 일만 나옴
                 todos = Todo.objects.filter(project_id=project_pk)
-        # 여러 개의 객체를 serialization하기 위해 many=True로 설정
                 serializer = TodoSerializer(todos, many=True)
                 return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     # 새로운 todo 글을 작성할 때
     def post(self, request, project_pk):
-        # request.data는 사용자의 입력 데이터
         project = Project.objects.get(pk=project_pk)
         serializer = TodoSerializer(data=request.data)
+        # 프젝에 있는 멤버
         members = Members.objects.filter(project=project)
         for member in members:
             if request.user.email == member.user:
                 if serializer.is_valid():  # 유효성 검사
+                    # 할일에 프젝정보랑 유저정보 넣어줌
                     serializer.validated_data["project"] = project
                     serializer.validated_data["user"] = request.user
                     serializer.save()  # 저장
@@ -184,11 +186,12 @@ class Tododetail(APIView):
     def get(self, request, project_pk, todo_pk, format=None):
         todo = self.get_object(project_pk, todo_pk)
         serializer = TodoSerializer(data=request.data)
-        # members = Members.objects.filter(project=project)
-        # for member in members:
-        #     if request.user.email == member.user:
-        serializer = TodoSerializer(todo)
-        return Response(serializer.data)
+        # 프로젝트안의 멤버만 투두 보기
+        members = Members.objects.filter(project=project_pk)
+        for member in members:
+            if request.user.email == member.user:
+                serializer = TodoSerializer(todo)
+                return Response(serializer.data)
 
     # todo 수정하기
     def put(self, request, project_pk, todo_pk, format=None):
@@ -273,17 +276,13 @@ class Membersadm(APIView):
 
     def post(self, request, pk):
         project = Project.objects.get(pk=pk)
-        print(request.data)
-        for dt in request.data:
-            print(dt)
-            serializer = MembersSerializer(data=dt)
-            if serializer.is_valid():
-                serializer.validated_data["project"] = project
-                # print(serializer.validated_data)
-                serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        serializer = MembersSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.validated_data["project"] = project
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        # return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 
