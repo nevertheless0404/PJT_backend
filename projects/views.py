@@ -100,67 +100,34 @@ class Projectdetail(APIView):
                 lead = member
                 if lead.user == request.user.email:
                     project.delete()
-        members = Members.objects.filter(project=project.pk)
-        lead = 0
-        for member in members:
-            if member.leader == 1:
-                lead = member
-                if lead.user == request.user.email:
-                    project.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    def delete(self, request, pk, format=None):
-        project = self.get_object(pk)
-        members = Members.objects.filter(project=project.pk)
-        lead = 0
-        for member in members:
-            if not member.leader == 1:
-                lead = member
-                if lead.user == request.user.email:
-                    project.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+    
 
 
 # 리더 권한 넘겨주기
 @api_view(["GET", "POST"])
 def changeleader(request, project_pk, leader_pk, format=None):
-    if request.method == "POST":
-        members = Members.objects.filter(pk=project_pk)
+    if request.method == "GET":
+        # 프로젝트 가져옴
+        members = Members.objects.filter(project=project_pk)
+        # 현재 리더 변수 할당
         nowleader = 0
+        # 멤버 돌리면서 현재 리더 찾기
         for member in members:
-            print(1)
             if member.leader == 1:
                 nowleader = member
-                print(11111111)
-                print(request.user)
-                print(nowleader.user)
                 break
-        if request.user == nowleader.user:
-            print(222222)
-            new = Members.objects.get(pk=leader_pk)
+        # 현재 리더와 로그인한 유저가 같으면
+        if request.user.email == nowleader.user:
+            # 유저정보를 가져온다
+            newleader = Members.objects.get(pk=leader_pk)
+            newleader.leader = 1
+            newleader.save()
             nowleader.leader = 0
-            new.leader = 1
-            new.save()
-            print(2)
             nowleader.save()
-            # serializer = MembersSerializer(member, data=request.data)
-            # print(serializer)
-            # if serializer.is_valid():
-            #     serializer.save()
-            # newleader = 0
-            # for member in members:
-            #     if member.user == new.email:
-            #         member.leader = 1
-            #         member.save()
-            #         break
         return Response("변경 성공!", status=status.HTTP_201_CREATED)
-        # new = User.objects.get(pk=leader_pk)
-        # print(project)
-        # project.save()
-    if request.method == "GET":
-        return Response("되니...?")
-    # return Response("변경 실패!", status=status.HTTP_400_BAD_REQUEST)
-
+    return Response("변경 실패!", status=status.HTTP_400_BAD_REQUEST)
 
 # todo의 목록을 보여주는 역할
 class Todolist(APIView):
@@ -338,9 +305,21 @@ class Membersadmdetail(APIView):
             if member.leader == 1:
                 for j in members:
                     if j.leader == 0:
-                        project.user = j
+                        us = User.objects.get(email = j.user)
+                        project.user = us
                         break
             member.delete()
+        
+        le = 0
+        for j in members:
+            if j.leader == 1:
+                le = 1
+        if le == 0:
+            for j in members:
+                j.leader = 1
+                break
+        print(members)
+
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 

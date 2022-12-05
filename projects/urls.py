@@ -22,10 +22,7 @@ urlpatterns = [
     path("<int:project_pk>/todo/", views.Todolist.as_view()),
     path("<int:project_pk>/todo/<int:todo_pk>/", views.Tododetail.as_view()),
     path("<int:project_pk>/todo/<int:todo_pk>/comment/", views.Commentlist.as_view()),
-    path(
-        "<int:project_pk>/todo/<int:todo_pk>/comment/<int:comment_pk>/",
-        views.Commentdetail.as_view(),
-    ),
+    path("<int:project_pk>/todo/<int:todo_pk>/comment/<int:comment_pk>/",views.Commentdetail.as_view()),
     path("ptoj/", views.Ptoj.as_view()),
     path("informs/<int:pk>/", views.Informslist.as_view()),
     path("informs/<int:pk>/", views.Informsdetail.as_view()),
