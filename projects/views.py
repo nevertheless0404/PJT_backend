@@ -109,7 +109,8 @@ class Projectdetail(APIView):
                     project.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-# 손봐야댐 나중에 봐야지 메롱메롱
+
+# 리더 권한 넘겨주기
 @api_view(["POST"])
 def changeleader(request, project_pk, leader_pk, format=None):
     if request.method == "POST":
@@ -210,6 +211,7 @@ class Tododetail(APIView):
             todo.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+
 class Ptoj(APIView):
     def get(self, request):
         mytodo = Todo.objects.filter(user=request.user)
@@ -285,7 +287,6 @@ class Membersadm(APIView):
 
 
 
-
 # comment의 목록을 보여주는 역할
 class Commentlist(APIView):
     permissions_classes = [IsAuthenticated]
@@ -305,9 +306,9 @@ class Commentlist(APIView):
         project = Project.objects.get(pk=project_pk)
         todo = Todo.objects.get(pk=todo_pk)
         if serializer.is_valid():  # 유효성 검사
-            serializer.validated_data['user'] = request.user
-            serializer.validated_data['project'] = project
-            serializer.validated_data['todo'] = todo
+            serializer.validated_data["user"] = request.user
+            serializer.validated_data["project"] = project
+            serializer.validated_data["todo"] = todo
             serializer.save()  # 저장
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -318,14 +319,18 @@ class Commentdetail(APIView):
     # comment 객체 가져오기
     def get_object(self, request, project_pk, todo_pk, comment_pk):
         try:
-            return Comment.objects.get(project_id=project_pk, todo_id=todo_pk, pk=comment_pk)
+            return Comment.objects.get(
+                project_id=project_pk, todo_id=todo_pk, pk=comment_pk
+            )
         except Project.DoesNotExist:
             raise Http404
 
     # comment의 detail 보기
     def get(self, request, project_pk, todo_pk, comment_pk, format=None):
         print(project_pk, todo_pk, comment_pk)
-        comment = Comment.objects.get(project_id=project_pk, todo_id=todo_pk, pk=comment_pk)
+        comment = Comment.objects.get(
+            project_id=project_pk, todo_id=todo_pk, pk=comment_pk
+        )
         serializer = CommentSerializer(comment)
         return Response(serializer.data)
 
@@ -338,17 +343,19 @@ class Commentdetail(APIView):
         todo = Todo.objects.get(pk=todo_pk)
         comment = Comment.objects.get(pk=comment_pk)
         if serializer.is_valid():  # 유효성 검사
-            serializer.validated_data['user'] = request.user
-            serializer.validated_data['parent'] = comment
-            serializer.validated_data['project'] = project
-            serializer.validated_data['todo'] = todo
+            serializer.validated_data["user"] = request.user
+            serializer.validated_data["parent"] = comment
+            serializer.validated_data["project"] = project
+            serializer.validated_data["todo"] = todo
             serializer.save()  # 저장
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     # comment 수정하기
     def put(self, request, project_pk, todo_pk, comment_pk, format=None):
-        comment = Comment.objects.get(project_id=project_pk, todo_id=todo_pk, pk=comment_pk)
+        comment = Comment.objects.get(
+            project_id=project_pk, todo_id=todo_pk, pk=comment_pk
+        )
         serializer = CommentSerializer(comment, data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -357,8 +364,9 @@ class Commentdetail(APIView):
 
     # comment 삭제하기 #
     def delete(self, request, project_pk, todo_pk, comment_pk, format=None):
-        comment = Comment.objects.get(project_id=project_pk, todo_id=todo_pk, pk=comment_pk)
+        comment = Comment.objects.get(
+            project_id=project_pk, todo_id=todo_pk, pk=comment_pk
+        )
         if comment.user == request.user:
             comment.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-
