@@ -65,6 +65,13 @@ REST_FRAMEWORK = {
     )
 }
 
+SIMPLE_JWT = {
+   'JWT_ALLOW_REFRESH': True,      # 토큰 새로고침 기능 활성화. 기본값 False.
+   'JWT_EXPIRATION_DELTA': timedelta(days=1),     # datetime.timedelta 의 만료 시간. 기본값 seconds=300.
+   'JWT_REFRESH_EXPIRATION_DELTA': timedelta(days=7), # Refresh Token의 새로 고침 시간. 기본값 days=7
+}
+
+
 # api에서 로그인
 SITE_ID = 6
 REST_USE_JWT = True
