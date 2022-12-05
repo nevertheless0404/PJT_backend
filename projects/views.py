@@ -109,24 +109,37 @@ class Projectdetail(APIView):
                     project.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+    def delete(self, request, pk, format=None):
+        project = self.get_object(pk)
+        members = Members.objects.filter(project=project.pk)
+        lead = 0
+        for member in members:
+            if not member.leader == 1:
+                lead = member
+                if lead.user == request.user.email:
+                    project.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 # 리더 권한 넘겨주기
-@api_view(["POST"])
+@api_view(["GET"])
 def changeleader(request, project_pk, leader_pk, format=None):
-    if request.method == "POST":
-        members = Members.objects.get(pk=project_pk)
+    if request.method == "GET":
+        members = Members.objects.filter(pk=project_pk)
         nowleader = 0
         for member in members:
             if member.leader == 1:
                 nowleader = member
                 break
-        if request.user == nowleader.user:
-            new = User.objects.get(pk=leader_pk)
-            nowleader.email = new.email
-            serializer = MembersSerializer(data=nowleader)
-            print(serializer)
-            if serializer.is_valid():
-                serializer.save()
+            if request.user.email == nowleader.user:
+                new = User.objects.filter(pk=leader_pk)
+                print(new)
+                nowleader.email = new.email
+                serializer = MembersSerializer(member, data=request.data)
+                print(serializer)
+                if serializer.is_valid():
+                    serializer.save()
+            # newleader = 0
             # for member in members:
             #     if member.user == new.email:
             #         member.leader = 1
