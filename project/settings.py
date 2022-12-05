@@ -64,6 +64,8 @@ REST_FRAMEWORK = {
         'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
     )
 }
+
+# api에서 로그인
 SITE_ID = 6
 REST_USE_JWT = True
 JWT_AUTH_COOKIE = 'my-app-auth'
