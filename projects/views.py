@@ -282,7 +282,7 @@ class Informsdetail(APIView):
         inform.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-
+# 멤버 추가
 class Membersadm(APIView):
     def get(self, request, pk):
         members = Members.objects.filter(project_id=pk)
@@ -297,6 +297,35 @@ class Membersadm(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class Membersadmdetail(APIView):
+    def get_object(self,project_pk, pk):
+        try:
+            return Members.objects.get(pk=pk)
+        except Members.DoesNotExist:
+            raise Http404
+    def get(self, request,project_pk, pk, format=None):
+        member = self.get_object(project_pk, pk)
+        serializer = MembersSerializer(member)
+        
+        return Response(serializer.data)
+
+    
+    def delete(self, request,project_pk, pk, format=None):
+        member = self.get_object(project_pk, pk)
+        project = Project.objects.get(pk=project_pk)
+        members = Members.objects.filter(project=project)
+        dele = False
+        for i in members:
+            if i.user == request.user:
+                if i.leader == 1:
+                    dele = True
+        if str(member.user) == str(request.user):
+            dele = True
+        if dele == True:
+            member.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+                    
 
 
 

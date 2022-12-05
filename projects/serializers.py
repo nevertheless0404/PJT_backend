@@ -19,7 +19,7 @@ class InformsSerializer(serializers.ModelSerializer):
 class MembersSerializer(serializers.ModelSerializer):
     class Meta:
         model = Members
-        fields = ['user']
+        fields = ['id','user']
 
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:

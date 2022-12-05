@@ -30,6 +30,7 @@ urlpatterns = [
     path("informs/<int:pk>/", views.Informslist.as_view()),
     path("informs/<int:pk>/", views.Informsdetail.as_view()),
     path("memberadmin/<int:pk>/", views.Membersadm.as_view()),
+    path("memberadmin/<int:project_pk>/<int:pk>/", views.Membersadmdetail.as_view()),
     path("changeleader/<int:project_pk>/<int:leader_pk>/", views.changeleader),
 ]
 
