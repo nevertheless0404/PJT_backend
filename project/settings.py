@@ -65,9 +65,11 @@ REST_FRAMEWORK = {
     )
 }
 
+# api에서 로그인
+SITE_ID = 6
 REST_USE_JWT = True
-# JWT_AUTH_COOKIE = 'my-app-auth'
-# JWT_AUTH_REFRESH_COOKIE = 'my-refresh-token'
+JWT_AUTH_COOKIE = 'my-app-auth'
+JWT_AUTH_REFRESH_COOKIE = 'my-refresh-token'
 
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
