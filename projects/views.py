@@ -122,34 +122,44 @@ class Projectdetail(APIView):
 
 
 # 리더 권한 넘겨주기
-@api_view(["GET"])
+@api_view(["GET", "POST"])
 def changeleader(request, project_pk, leader_pk, format=None):
-    if request.method == "GET":
+    if request.method == "POST":
         members = Members.objects.filter(pk=project_pk)
         nowleader = 0
         for member in members:
+            print(1)
             if member.leader == 1:
                 nowleader = member
+                print(11111111)
+                print(request.user)
+                print(nowleader.user)
                 break
-            if request.user.email == nowleader.user:
-                new = User.objects.filter(pk=leader_pk)
-                print(new)
-                nowleader.email = new.email
-                serializer = MembersSerializer(member, data=request.data)
-                print(serializer)
-                if serializer.is_valid():
-                    serializer.save()
+        if request.user == nowleader.user:
+            print(222222)
+            new = Members.objects.get(pk=leader_pk)
+            nowleader.leader = 0
+            new.leader = 1
+            new.save()
+            print(2)
+            nowleader.save()
+            # serializer = MembersSerializer(member, data=request.data)
+            # print(serializer)
+            # if serializer.is_valid():
+            #     serializer.save()
             # newleader = 0
             # for member in members:
             #     if member.user == new.email:
             #         member.leader = 1
             #         member.save()
             #         break
-            return Response("변경 성공!", status=status.HTTP_201_CREATED)
-            # new = User.objects.get(pk=leader_pk)
-            # print(project)
-            # project.save()
-    return Response("변경 실패!", status=status.HTTP_400_BAD_REQUEST)
+        return Response("변경 성공!", status=status.HTTP_201_CREATED)
+        # new = User.objects.get(pk=leader_pk)
+        # print(project)
+        # project.save()
+    if request.method == "GET":
+        return Response("되니...?")
+    # return Response("변경 실패!", status=status.HTTP_400_BAD_REQUEST)
 
 
 # todo의 목록을 보여주는 역할
@@ -282,6 +292,7 @@ class Informsdetail(APIView):
         inform.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+
 # 멤버 추가
 class Membersadm(APIView):
     def get(self, request, pk):
@@ -298,20 +309,21 @@ class Membersadm(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 class Membersadmdetail(APIView):
-    def get_object(self,project_pk, pk):
+    def get_object(self, project_pk, pk):
         try:
             return Members.objects.get(pk=pk)
         except Members.DoesNotExist:
             raise Http404
-    def get(self, request,project_pk, pk, format=None):
+
+    def get(self, request, project_pk, pk, format=None):
         member = self.get_object(project_pk, pk)
         serializer = MembersSerializer(member)
-        
+
         return Response(serializer.data)
 
-    
-    def delete(self, request,project_pk, pk, format=None):
+    def delete(self, request, project_pk, pk, format=None):
         member = self.get_object(project_pk, pk)
         project = Project.objects.get(pk=project_pk)
         members = Members.objects.filter(project=project)
@@ -323,10 +335,13 @@ class Membersadmdetail(APIView):
         if str(member.user) == str(request.user):
             dele = True
         if dele == True:
+            if member.leader == 1:
+                for j in members:
+                    if j.leader == 0:
+                        project.user = j
+                        break
             member.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-                    
-
 
 
 # comment의 목록을 보여주는 역할
