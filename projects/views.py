@@ -109,30 +109,24 @@ class Projectdetail(APIView):
 @api_view(["GET"])
 def changeleader(request, project_pk, leader_pk, format=None):
     if request.method == "GET":
-        members = Members.objects.filter(pk=project_pk)
+        # 프로젝트 가져옴
+        members = Members.objects.filter(project=project_pk)
+        # 현재 리더 변수 할당
         nowleader = 0
+        # 멤버 돌리면서 현재 리더 찾기
         for member in members:
             if member.leader == 1:
                 nowleader = member
                 break
-            if request.user.email == nowleader.user:
-                new = User.objects.filter(pk=leader_pk)
-                print(new)
-                nowleader.email = new.email
-                serializer = MembersSerializer(member, data=request.data)
-                print(serializer)
-                if serializer.is_valid():
-                    serializer.save()
-            # newleader = 0
-            # for member in members:
-            #     if member.user == new.email:
-            #         member.leader = 1
-            #         member.save()
-            #         break
-            return Response("변경 성공!", status=status.HTTP_201_CREATED)
-            # new = User.objects.get(pk=leader_pk)
-            # print(project)
-            # project.save()
+        # 현재 리더와 로그인한 유저가 같으면
+        if request.user.email == nowleader.user:
+            # 유저정보를 가져온다
+            newleader = Members.objects.get(pk=leader_pk)
+            newleader.leader = 1
+            newleader.save()
+            nowleader.leader = 0
+            nowleader.save()
+        return Response("변경 성공!", status=status.HTTP_201_CREATED)
     return Response("변경 실패!", status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -307,7 +301,14 @@ class Membersadmdetail(APIView):
         if str(member.user) == str(request.user):
             dele = True
         if dele == True:
+            if member.leader == 1:
+                for j in members:
+                    if j.leader == 0:
+                        us = User.objects.get(email = j.user)
+                        project.user = us
+                        break
             member.delete()
+        
         le = 0
         for j in members:
             if j.leader == 1:
@@ -315,6 +316,7 @@ class Membersadmdetail(APIView):
         if le == 0:
             for j in members:
                 j.leader = 1
+                break
         print(members)
 
         return Response(status=status.HTTP_204_NO_CONTENT)
