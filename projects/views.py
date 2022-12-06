@@ -21,6 +21,13 @@ from django.http import Http404
 from django.shortcuts import redirect, get_object_or_404
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 
+
+class RecentProjectlist(APIView):
+    def get(self, request):
+        project = Project.objects.filter(user_id=request.user.pk).order_by('-pk')[0]
+        serializer = ProjectSerializer(project)
+        return Response(serializer.data)
+
 # project의 목록을 보여주는 역할
 class Projectlist(APIView):
     permissions_classes = [IsAuthenticated]
@@ -102,7 +109,7 @@ class Projectdetail(APIView):
                     project.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    
+
 
 
 # 리더 권한 넘겨주기
@@ -291,10 +298,10 @@ class Membersadmdetail(APIView):
     def get(self, request,project_pk, pk, format=None):
         member = self.get_object(project_pk, pk)
         serializer = MembersSerializer(member)
-        
+
         return Response(serializer.data)
 
-    
+
     def delete(self, request,project_pk, pk, format=None):
         member = self.get_object(project_pk, pk)
         project = Project.objects.get(pk=project_pk)
@@ -318,7 +325,7 @@ class Membersadmdetail(APIView):
         print(members)
 
         return Response(status=status.HTTP_204_NO_CONTENT)
-                    
+
 
 
 

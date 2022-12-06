@@ -21,6 +21,11 @@ class ProjectSerializer(serializers.ModelSerializer):
         model = Project
         fields = ["id","title","start_at","end_at","goal","skill","functions", "todo_project", "comments"]
 
+class RecentProjectSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Project
+        fields = ["id"]
+
 class InformsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Informs
