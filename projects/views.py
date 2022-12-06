@@ -296,30 +296,15 @@ class Membersadmdetail(APIView):
         members = Members.objects.filter(project=project)
         dele = False
         for i in members:
-            if i.user == request.user:
+            if str(i.user) == str(request.user):
                 if i.leader == 1:
                     dele = True
         if str(member.user) == str(request.user):
             dele = True
+        print(dele)
         if dele == True:
-            if member.leader == 1:
-                for j in members:
-                    if j.leader == 0:
-                        us = User.objects.get(email = j.user)
-                        project.user = us
-                        break
-            member.delete()
-        
-        le = 0
-        for j in members:
-            if j.leader == 1:
-                le = 1
-        if le == 0:
-            for j in members:
-                j.leader = 1
-                break
-        print(members)
-
+            if member.leader == 0:
+                member.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
