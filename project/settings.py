@@ -15,10 +15,18 @@ from datetime import timedelta
 import os
 from pathlib import Path
 import environ
+import json
+import sys
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+ROOT_DIR = os.path.dirname(BASE_DIR)
+SECRET_BASE_FILE = os.path.join(BASE_DIR, 'secrets.json')
+secrets = json.loads(open(SECRET_BASE_FILE).read())
+for key, value in secrets.items():
+    setattr(sys.modules[__name__], key, value)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
@@ -43,30 +51,41 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "rest_framework",
-    "rest_framework.authtoken",
-    "dj_rest_auth",
-    "django.contrib.sites",
-    "allauth",
-    "allauth.account",
-    "allauth.socialaccount",
-    "allauth.socialaccount.providers.google",
-    "dj_rest_auth.registration",
-    "corsheaders",
+    'rest_framework',
+    'rest_framework.authtoken',
+    'rest_framework_simplejwt.token_blacklist',
+    'django.contrib.sites',
+    'allauth',
+    'allauth.account',
+    # 소셜 로그인
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
+    'dj_rest_auth',
+    'dj_rest_auth.registration',
+    'corsheaders',
 ]
 
 REST_FRAMEWORK = {
-    "DEFAULT_PERMISSION_CLASSES": [
-        # 'rest_framework.permissions.AllowAny', # 지정해주지않으면, Default로 AllowAny가 적용
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny', # 지정해주지않으면, Default로 AllowAny가 적용
         # 'rest_framework.permissions.IsAuthenticated',
     ],
-    "DEFAULT_AUTHENTICATION_CLASSES": (
-        "dj_rest_auth.jwt_auth.JWTCookieAuthentication",
-    ),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.SessionAuthentication',
+        'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
+    )
 }
 
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=7),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=14),
+    'ROTATE_REFRESH_TOKENS': False,
+    'BLACKLIST_AFTER_ROTATION': True,
+}
+
+
 # api에서 로그인
-SITE_ID = 2
+SITE_ID = 8
 REST_USE_JWT = True
 JWT_AUTH_COOKIE = "my-app-auth"
 JWT_AUTH_REFRESH_COOKIE = "my-refresh-token"
@@ -84,27 +103,6 @@ AUTH_USER_MODEL = "accounts.User"
 env = environ.Env(DEBUG=(bool, True))
 environ.Env.read_env(env_file=os.path.join(BASE_DIR, ".env"))
 
-# SOCIALACCOUNT_PROVIDERS = {
-# "google": {
-#     # For each OAuth based provider, either add a ``SocialApp``
-#     # (``socialaccount`` app) containing the required client
-#     # credentials, or list them here:
-#     "APP": {
-#         "client_id": env('SOCIAL_AUTH_GOOGLE_CLIENT_ID'),
-#         "secret": env('SOCIAL_AUTH_GOOGLE_SECRET'),
-#         "key": env('key'),
-#     },
-#     # These are provider-specific settings that can only be
-#     # listed here:
-#     "SCOPE": [
-#         "profile",
-#         "email",
-#     ],
-#     "AUTH_PARAMS": {
-#         "access_type": "online",
-#     }
-# }}
-
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
@@ -117,7 +115,6 @@ MIDDLEWARE = [
 ]
 
 CORS_ORIGIN_WHITELIST = [
-    # 허용할 Origin 추가
     "http://localhost:8080",
     "http://127.0.0.1:8080",
     "http://192.168.0.6:8080",
