@@ -106,35 +106,28 @@ class Projectdetail(APIView):
 
 
 # 리더 권한 넘겨주기
-@api_view(["GET"])
+@api_view(["GET", "POST"])
 def changeleader(request, project_pk, leader_pk, format=None):
     if request.method == "GET":
-        members = Members.objects.filter(pk=project_pk)
+        # 프로젝트 가져옴
+        members = Members.objects.filter(project=project_pk)
+        # 현재 리더 변수 할당
         nowleader = 0
+        # 멤버 돌리면서 현재 리더 찾기
         for member in members:
             if member.leader == 1:
                 nowleader = member
                 break
-            if request.user.email == nowleader.user:
-                new = User.objects.filter(pk=leader_pk)
-                print(new)
-                nowleader.email = new.email
-                serializer = MembersSerializer(member, data=request.data)
-                print(serializer)
-                if serializer.is_valid():
-                    serializer.save()
-            # newleader = 0
-            # for member in members:
-            #     if member.user == new.email:
-            #         member.leader = 1
-            #         member.save()
-            #         break
-            return Response("변경 성공!", status=status.HTTP_201_CREATED)
-            # new = User.objects.get(pk=leader_pk)
-            # print(project)
-            # project.save()
+        # 현재 리더와 로그인한 유저가 같으면
+        if request.user.email == nowleader.user:
+            # 유저정보를 가져온다
+            newleader = Members.objects.get(pk=leader_pk)
+            newleader.leader = 1
+            newleader.save()
+            nowleader.leader = 0
+            nowleader.save()
+        return Response("변경 성공!", status=status.HTTP_201_CREATED)
     return Response("변경 실패!", status=status.HTTP_400_BAD_REQUEST)
-
 
 # todo의 목록을 보여주는 역할
 class Todolist(APIView):
@@ -266,6 +259,7 @@ class Informsdetail(APIView):
         inform.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+
 # 멤버 추가
 class Membersadm(APIView):
     def get(self, request, pk):
@@ -282,44 +276,36 @@ class Membersadm(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 class Membersadmdetail(APIView):
-    def get_object(self,project_pk, pk):
+    def get_object(self, project_pk, pk):
         try:
             return Members.objects.get(pk=pk)
         except Members.DoesNotExist:
             raise Http404
-    def get(self, request,project_pk, pk, format=None):
+
+    def get(self, request, project_pk, pk, format=None):
         member = self.get_object(project_pk, pk)
         serializer = MembersSerializer(member)
-        
+
         return Response(serializer.data)
 
-    
-    def delete(self, request,project_pk, pk, format=None):
+    def delete(self, request, project_pk, pk, format=None):
         member = self.get_object(project_pk, pk)
         project = Project.objects.get(pk=project_pk)
         members = Members.objects.filter(project=project)
         dele = False
         for i in members:
-            if i.user == request.user:
+            if str(i.user) == str(request.user):
                 if i.leader == 1:
                     dele = True
         if str(member.user) == str(request.user):
             dele = True
+        print(dele)
         if dele == True:
-            member.delete()
-        le = 0
-        for j in members:
-            if j.leader == 1:
-                le = 1
-        if le == 0:
-            for j in members:
-                j.leader = 1
-        print(members)
-
+            if member.leader == 0:
+                member.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-                    
-
 
 
 # comment의 목록을 보여주는 역할
