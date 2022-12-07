@@ -17,6 +17,10 @@ from pathlib import Path
 import environ
 import json
 import sys
+from dotenv import load_dotenv
+import os
+load_dotenv()
+
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 ROOT_DIR = os.path.dirname(BASE_DIR)
@@ -148,11 +152,45 @@ WSGI_APPLICATION = "project.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": "pjt", # 코드 블럭 아래 이미지 참고하여 입력
+        "USER": "postgres",
+        "PASSWORD": "rlaekrua123!", # 데이터베이스 생성 시 작성한 패스워드
+        "HOST": "pjt.c16ciw5urblf.ap-northeast-2.rds.amazonaws.com", # 코드 블럭 아래 이미지 참고하여 입력
+        "PORT": "5432",
     }
 }
 
+DEBUG = os.getenv("DEBUG") == "True"
+
+if DEBUG == True: # 개발(로컬) 환경
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
+
+else: # 배포(원격, 클라우드) 환경
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": os.getenv("DATABASE_NAME"), # .env 파일에 value 작성
+            "USER": "postgres",
+            "PASSWORD": os.getenv("DATABASE_PASSWORD"), # .env 파일에 value 작성
+            "HOST": os.getenv("DATABASE_HOST"), # .env 파일에 value 작성
+            "PORT": "5432",
+        }
+    }
+ALLOWED_HOSTS = [
+		# "Elastic Beanstalk URL",
+    "pjt-env.eba-gts2sgmb.ap-northeast-2.elasticbeanstalk.com/", # 예시입니다. 본인 URL로 해주세요.
+    "127.0.0.1",
+    "localhost",
+]
+
+STATIC_URL = '/static/'
+STATIC_ROOT = 'staticfiles'
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
