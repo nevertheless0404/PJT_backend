@@ -36,12 +36,17 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-gc5&h&tmp=c6-v-*3jv98ec#vn=wmtctbj%$^6+&hz0_+je(=4"
+SECRET_KEY = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+		# "Elastic Beanstalk URL",
+    "pjt-env.eba-gts2sgmb.ap-northeast-2.elasticbeanstalk.com/", # 예시입니다. 본인 URL로 해주세요.
+    "127.0.0.1",
+    "localhost",
+]
 
 
 # Application definition
@@ -69,18 +74,6 @@ INSTALLED_APPS = [
     'corsheaders',
     "storages",
 ]
-
-DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
-
-AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
-AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
-AWS_STORAGE_BUCKET_NAME = os.getenv("AWS_STORAGE_BUCKET_NAME")
-
-AWS_REGION = "ap-northeast-2"
-AWS_S3_CUSTOM_DOMAIN = "%s.s3.%s.amazonaws.com" % (
-    AWS_STORAGE_BUCKET_NAME,
-    AWS_REGION,
-)
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
@@ -117,8 +110,6 @@ ACCOUNT_EMAIL_VERIFICATION = "none"
 
 AUTH_USER_MODEL = "accounts.User"
 
-env = environ.Env(DEBUG=(bool, True))
-environ.Env.read_env(env_file=os.path.join(BASE_DIR, ".env"))
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
@@ -163,16 +154,6 @@ WSGI_APPLICATION = "project.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": "pjt", # 코드 블럭 아래 이미지 참고하여 입력
-        "USER": "postgres",
-        "PASSWORD": "rlaekrua123!", # 데이터베이스 생성 시 작성한 패스워드
-        "HOST": "pjt.c16ciw5urblf.ap-northeast-2.rds.amazonaws.com", # 코드 블럭 아래 이미지 참고하여 입력
-        "PORT": "5432",
-    }
-}
 
 DEBUG = os.getenv("DEBUG") == "True"
 
@@ -193,7 +174,6 @@ else:
         AWS_REGION,
     )
 
-DEBUG = os.getenv("DEBUG") == "True"
 
 if DEBUG == True: # 개발(로컬) 환경
     DATABASES = {
@@ -214,12 +194,7 @@ else: # 배포(원격, 클라우드) 환경
             "PORT": "5432",
         }
     }
-ALLOWED_HOSTS = [
-		# "Elastic Beanstalk URL",
-    "pjt-env.eba-gts2sgmb.ap-northeast-2.elasticbeanstalk.com/", # 예시입니다. 본인 URL로 해주세요.
-    "127.0.0.1",
-    "localhost",
-]
+
 
 STATIC_URL = '/static/'
 STATIC_ROOT = 'staticfiles'
