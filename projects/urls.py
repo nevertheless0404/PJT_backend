@@ -19,6 +19,7 @@ from . import views
 urlpatterns = [
     path("project/", views.Projectlist.as_view()),
     path("project/<int:pk>/", views.Projectdetail.as_view()),
+    path("recent_project/", views.RecentProjectlist.as_view()),
     path("<int:project_pk>/todo/", views.Todolist.as_view()),
     path("<int:project_pk>/todo/<int:todo_pk>/", views.Tododetail.as_view()),
     path("<int:project_pk>/todo/<int:todo_pk>/comment/", views.Commentlist.as_view()),
