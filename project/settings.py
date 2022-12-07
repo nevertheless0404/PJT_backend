@@ -41,6 +41,7 @@ ALLOWED_HOSTS = [
     "localhost",
 ]
 
+
 CSRF_TRUSTED_ORIGINS = ["http://172.30.1.22:8080"]
 # Application definition
 
@@ -153,7 +154,7 @@ DEBUG = os.getenv("DEBUG") == "True"
 if DEBUG:
     MEDIA_URL = "/media/"
     MEDIA_ROOT = BASE_DIR / "media"
-    
+
 
 else:
     DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
@@ -176,6 +177,7 @@ if DEBUG == True:  # 개발(로컬) 환경
             "NAME": BASE_DIR / "db.sqlite3",
         }
     }
+
 
 else:  # 배포(원격, 클라우드) 환경
     DATABASES = {
