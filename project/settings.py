@@ -171,7 +171,7 @@ if DEBUG == True: # 개발(로컬) 환경
         }
     }
 
-else: # 배포(원격, 클라우드) 환경
+else: # 배포(원격, 클라우드) 환경!
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",
