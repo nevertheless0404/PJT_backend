@@ -10,8 +10,12 @@ import requests
 from rest_framework import status
 from json.decoder import JSONDecodeError
 from django.shortcuts import redirect
+from dotenv import load_dotenv
+import os
+load_dotenv()
 
-state = getattr(settings, 'STATE')
+
+state = os.getenv("STATE")
 BASE_URL = 'http://localhost:8000/'
 GOOGLE_CALLBACK_URI = BASE_URL + 'api/accounts/v1/google/callback/'
 def google_login(request):
@@ -19,11 +23,11 @@ def google_login(request):
     Code Request
     """
     scope = "https://www.googleapis.com/auth/userinfo.email"
-    client_id = getattr(settings, "SOCIAL_AUTH_GOOGLE_CLIENT_ID")
+    client_id =  os.getenv("SOCIAL_AUTH_GOOGLE_CLIENT_ID")
     return redirect(f"https://accounts.google.com/o/oauth2/v2/auth?client_id={client_id}&response_type=code&redirect_uri={GOOGLE_CALLBACK_URI}&scope={scope}")
 def google_callback(request):
-    client_id = getattr(settings, "SOCIAL_AUTH_GOOGLE_CLIENT_ID")
-    client_secret = getattr(settings, "SOCIAL_AUTH_GOOGLE_SECRET")
+    client_id =  os.getenv("SOCIAL_AUTH_GOOGLE_CLIENT_ID")
+    client_secret = os.getenv("SOCIAL_AUTH_GOOGLE_SECRET")
     code = request.GET.get('code')
     """
     Access Token Request
