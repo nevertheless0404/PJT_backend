@@ -14,11 +14,9 @@ from pathlib import Path
 from datetime import timedelta
 import os
 from pathlib import Path
-import environ
-import json
-import sys
 from dotenv import load_dotenv
 import os
+
 load_dotenv()
 
 
@@ -35,16 +33,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
 
 ALLOWED_HOSTS = [
-		# "Elastic Beanstalk URL",
-    "pjt-env.eba-gts2sgmb.ap-northeast-2.elasticbeanstalk.com/", # 예시입니다. 본인 URL로 해주세요.
+    # "Elastic Beanstalk URL",
+    "pjt-env.eba-gts2sgmb.ap-northeast-2.elasticbeanstalk.com",  # 예시입니다. 본인 URL로 해주세요.
     "127.0.0.1",
     "localhost",
 ]
 
-
+CSRF_TRUSTED_ORIGINS = ["http://172.30.1.22:8080"]
 # Application definition
 
 INSTALLED_APPS = [
@@ -56,37 +53,37 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    'rest_framework',
-    'rest_framework.authtoken',
-    'rest_framework_simplejwt.token_blacklist',
-    'django.contrib.sites',
-    'allauth',
-    'allauth.account',
+    "rest_framework",
+    "rest_framework.authtoken",
+    "rest_framework_simplejwt.token_blacklist",
+    "django.contrib.sites",
+    "allauth",
+    "allauth.account",
     # 소셜 로그인
-    'allauth.socialaccount',
-    'allauth.socialaccount.providers.google',
-    'dj_rest_auth',
-    'dj_rest_auth.registration',
-    'corsheaders',
+    "allauth.socialaccount",
+    "allauth.socialaccount.providers.google",
+    "dj_rest_auth",
+    "dj_rest_auth.registration",
+    "corsheaders",
     "storages",
 ]
 
 REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.AllowAny', # 지정해주지않으면, Default로 AllowAny가 적용
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.AllowAny",  # 지정해주지않으면, Default로 AllowAny가 적용
         # 'rest_framework.permissions.IsAuthenticated',
     ],
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.SessionAuthentication',
-        'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
-    )
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework.authentication.SessionAuthentication",
+        "dj_rest_auth.jwt_auth.JWTCookieAuthentication",
+    ),
 }
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(days=7),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=14),
-    'ROTATE_REFRESH_TOKENS': False,
-    'BLACKLIST_AFTER_ROTATION': True,
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=7),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=14),
+    "ROTATE_REFRESH_TOKENS": False,
+    "BLACKLIST_AFTER_ROTATION": True,
 }
 
 
@@ -112,7 +109,7 @@ MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
-    "django.middleware.csrf.CsrfViewMiddleware",
+    # "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
@@ -153,11 +150,12 @@ WSGI_APPLICATION = "project.wsgi.application"
 
 DEBUG = os.getenv("DEBUG") == "True"
 
-if DEBUG: 
+if DEBUG:
     MEDIA_URL = "/media/"
     MEDIA_ROOT = BASE_DIR / "media"
+    
 
-else:   
+else:
     DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
 
     AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
@@ -171,29 +169,29 @@ else:
     )
 
 
-if DEBUG == True: # 개발(로컬) 환경
+if DEBUG == True:  # 개발(로컬) 환경
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
         }
     }
 
-else: # 배포(원격, 클라우드) 환경
+else:  # 배포(원격, 클라우드) 환경
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",
-            "NAME": os.getenv("DATABASE_NAME"), # .env 파일에 value 작성
+            "NAME": os.getenv("DATABASE_NAME"),  # .env 파일에 value 작성
             "USER": "postgres",
-            "PASSWORD": os.getenv("DATABASE_PASSWORD"), # .env 파일에 value 작성
-            "HOST": os.getenv("DATABASE_HOST"), # .env 파일에 value 작성
+            "PASSWORD": os.getenv("DATABASE_PASSWORD"),  # .env 파일에 value 작성
+            "HOST": os.getenv("DATABASE_HOST"),  # .env 파일에 value 작성
             "PORT": "5432",
         }
     }
 
 
-STATIC_URL = '/static/'
-STATIC_ROOT = 'staticfiles'
+STATIC_URL = "/static/"
+STATIC_ROOT = "staticfiles"
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
