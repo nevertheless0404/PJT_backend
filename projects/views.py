@@ -276,12 +276,22 @@ class Membersadm(APIView):
 
     def post(self, request, pk):
         project = Project.objects.get(pk=pk)
-        serializer = MembersSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.validated_data["project"] = project
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        members = Members.objects.filter(project_id=pk)
+        mememail = []
+        for member in members:
+            mememail.append(member.user)
+        email = request.data['user'].split(' ')
+        for i in email:
+            dict_ = {'user': ''}
+            dict_['user'] = i
+            if i not in mememail:
+                serializer = MembersSerializer(data=dict_)
+                if serializer.is_valid():
+                    serializer.validated_data["project"] = project
+                    serializer.save()
+            else:
+                continue
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 class Membersadmdetail(APIView):
