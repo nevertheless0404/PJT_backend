@@ -4,8 +4,8 @@ from django.conf import settings
 # Create your models here.
 class Project(models.Model):
     title = models.CharField(max_length=30)
-    start_at = models.DateTimeField()
-    end_at = models.DateTimeField()
+    start_at = models.DateField()
+    end_at = models.DateField()
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="project_user"
     )
