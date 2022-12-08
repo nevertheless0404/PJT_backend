@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .models import Project, Todo, Informs, Members, Comment
+from .models import Project, Todo, Informs, Members, Comment, Markdown
 from accounts.models import User
 from rest_framework.decorators import api_view
 from rest_framework import viewsets
@@ -11,6 +11,7 @@ from .serializers import (
     InformsSerializer,
     MembersSerializer,
     CommentSerializer,
+    MarkdownSerializer,
 )
 from django.contrib.auth import get_user_model
 from rest_framework.views import APIView
@@ -56,6 +57,9 @@ class Projectlist(APIView):
                 project = Project.objects.get(pk=serializer.data["id"])
                 # 멤버스 안에 만든사람 db에 저장하기
                 Members.objects.create(user=request.user, leader=1, project=project)
+                # Markdown 안에 프로젝트 내용 저장하기
+                content = '# ' + project.title + '\n' + '## 서비스 목표 ' + project.goal + '\n' + '## 개발 기간 ' + str(project.start_at) + ' ~ ' + str(project.end_at) + '\n' + '## 팀원 ' + '\n' + '## 기술 스택 ' + project.skill + '\n' + '## 주요 기능 ' + project.functions
+                Markdown.objects.create(project=project, content=content)
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -109,8 +113,12 @@ class Projectdetail(APIView):
                     project.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-
-
+# markdown detail을 보여주는 역할
+class Markdowndetail(APIView):
+    def get(self, request, pk):
+        markdown = Markdown.objects.get(project_id=pk)
+        serializer = MarkdownSerializer(markdown)
+        return Response(serializer.data)
 
 # 리더 권한 넘겨주기
 @api_view(["GET", "POST"])

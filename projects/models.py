@@ -53,5 +53,6 @@ class Comment(models.Model):
     comment = models.CharField(max_length=100)
     created_at = models.DateTimeField("생성시간", auto_now_add=True)
 
-
-#
+class Markdown(models.Model):
+    content = models.TextField()
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, null=True)
