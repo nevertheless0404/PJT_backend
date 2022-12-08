@@ -135,7 +135,6 @@ def changeleader(request, project_pk, leader_pk, format=None):
         return Response("변경 성공!", status=status.HTTP_201_CREATED)
     return Response("변경 실패!", status=status.HTTP_400_BAD_REQUEST)
 
-
 # todo의 목록을 보여주는 역할
 class Todolist(APIView):
     # permissions_classes = [IsAuthenticated]
@@ -154,22 +153,16 @@ class Todolist(APIView):
 
     # 새로운 todo 글을 작성할 때
     def post(self, request, project_pk):
-        project = Project.objects.get(pk=project_pk)
         serializer = TodoSerializer(data=request.data)
         # 프젝에 있는 멤버
-        members = Members.objects.filter(project=project)
         for member in members:
             if request.user.email == member.user:
                 if serializer.is_valid():  # 유효성 검사
                     # 할일에 프젝정보랑 유저정보 넣어줌
-                    serializer.validated_data["project"] = project
                     serializer.validated_data["user"] = request.user
-                    serializer.save()  # 저장
                     return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
-# todo의 detail을 보여주는 역할
 class Tododetail(APIView):
     permissions_classes = [IsAuthenticated]
     # todo 객체 가져오기
