@@ -25,9 +25,10 @@ from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnl
 
 class RecentProjectlist(APIView):
     def get(self, request):
-        project = Project.objects.filter(user_id=request.user.pk).order_by('-pk')[0]
+        project = Project.objects.filter(user_id=request.user.pk).order_by("-pk")[0]
         serializer = ProjectSerializer(project)
         return Response(serializer.data)
+
 
 # project의 목록을 보여주는 역할
 class Projectlist(APIView):
@@ -38,7 +39,7 @@ class Projectlist(APIView):
         members = Members.objects.filter(user=request.user)
         projects = []
         for member in members:
-            # 참여하는 프젝만 보여짐
+            # 참여하는 프로젝트 보여짐
             project = Project.objects.get(pk=member.project.pk)
             projects.append(project)
         # 여러 개의 객체를 serialization하기 위해 many=True로 설정
@@ -143,6 +144,7 @@ def changeleader(request, project_pk, leader_pk, format=None):
             nowleader.save()
         return Response("변경 성공!", status=status.HTTP_201_CREATED)
     return Response("변경 실패!", status=status.HTTP_400_BAD_REQUEST)
+
 
 # todo의 목록을 보여주는 역할
 class Todolist(APIView):
@@ -284,12 +286,22 @@ class Membersadm(APIView):
 
     def post(self, request, pk):
         project = Project.objects.get(pk=pk)
-        serializer = MembersSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.validated_data["project"] = project
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        members = Members.objects.filter(project_id=pk)
+        mememail = []
+        for member in members:
+            mememail.append(member.user)
+        email = request.data["user"].split(" ")
+        for i in email:
+            dict_ = {"user": ""}
+            dict_["user"] = i
+            if i not in mememail:
+                serializer = MembersSerializer(data=dict_)
+                if serializer.is_valid():
+                    serializer.validated_data["project"] = project
+                    serializer.save()
+            else:
+                continue
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 class Membersadmdetail(APIView):
@@ -304,7 +316,6 @@ class Membersadmdetail(APIView):
         serializer = MembersSerializer(member)
 
         return Response(serializer.data)
-
 
     def delete(self, request, project_pk, pk, format=None):
         member = self.get_object(project_pk, pk)
@@ -322,6 +333,7 @@ class Membersadmdetail(APIView):
             if member.leader == 0:
                 member.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 # comment의 목록을 보여주는 역할
 class Commentlist(APIView):
