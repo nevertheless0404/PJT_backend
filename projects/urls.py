@@ -30,6 +30,7 @@ urlpatterns = [
     path("memberadmin/<int:pk>/", views.Membersadm.as_view()),
     path("memberadmin/<int:project_pk>/<int:pk>/", views.Membersadmdetail.as_view()),
     path("changeleader/<int:project_pk>/<int:leader_pk>/", views.changeleader),
+    path("<int:pk>/markdown/", views.Markdowndetail.as_view())
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)

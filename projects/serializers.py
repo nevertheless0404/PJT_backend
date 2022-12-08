@@ -1,4 +1,4 @@
-from .models import Project, Todo, Informs, Members, Comment
+from .models import Project, Todo, Informs, Members, Comment, Markdown
 from rest_framework import serializers
 
 class CommentSerializer(serializers.ModelSerializer):
@@ -14,12 +14,17 @@ class TodoSerializer(serializers.ModelSerializer):
         model = Todo
         fields = ["id","title","start_at","end_at","content", "comments"]
 
+class MarkdownSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Markdown
+        fields = ["project", "content"]
+
 class ProjectSerializer(serializers.ModelSerializer):
-    todo_project = TodoSerializer(read_only=True, many=True)
-    comments = CommentSerializer(read_only=True, many=True)
+    user_id = serializers.ReadOnlyField()
+
     class Meta:
         model = Project
-        fields = ["id","title","start_at","end_at","goal","skill","functions", "todo_project", "comments"]
+        fields = ["id","title","start_at", "end_at","goal","skill","functions", "user_id"]
 
 class RecentProjectSerializer(serializers.ModelSerializer):
     class Meta:
