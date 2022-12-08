@@ -23,8 +23,8 @@ class Todo(models.Model):
     project = models.ForeignKey(
         Project, on_delete=models.CASCADE, related_name="todo_project"
     )
-    start_at = models.DateTimeField()
-    end_at = models.DateTimeField()
+    start_at = models.DateField()
+    end_at = models.DateField()
     complete = models.IntegerField(default=0)
 
 

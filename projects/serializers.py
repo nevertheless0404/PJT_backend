@@ -17,9 +17,11 @@ class TodoSerializer(serializers.ModelSerializer):
 class ProjectSerializer(serializers.ModelSerializer):
     todo_project = TodoSerializer(read_only=True, many=True)
     comments = CommentSerializer(read_only=True, many=True)
+    user_id = serializers.ReadOnlyField()
+
     class Meta:
         model = Project
-        fields = ["id","title","start_at","end_at","goal","skill","functions", "todo_project", "comments"]
+        fields = ["id","title","start_at", "end_at","goal","skill","functions", "user_id", "todo_project", "comments"]
 
 class RecentProjectSerializer(serializers.ModelSerializer):
     class Meta:
