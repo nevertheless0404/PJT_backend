@@ -163,13 +163,17 @@ class Todolist(APIView):
 
     # 새로운 todo 글을 작성할 때
     def post(self, request, project_pk):
+        project = Project.objects.get(pk=project_pk)
         serializer = TodoSerializer(data=request.data)
         # 프젝에 있는 멤버
+        members = Members.objects.filter(project=project)
         for member in members:
             if request.user.email == member.user:
                 if serializer.is_valid():  # 유효성 검사
                     # 할일에 프젝정보랑 유저정보 넣어줌
+                    serializer.validated_data["project"] = project
                     serializer.validated_data["user"] = request.user
+                    serializer.save()
                     return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

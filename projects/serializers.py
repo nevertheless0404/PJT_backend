@@ -12,7 +12,7 @@ class TodoSerializer(serializers.ModelSerializer):
     comments = CommentSerializer(read_only=True, many=True)
     class Meta:
         model = Todo
-        fields = ["id","title","start_at","end_at","content", "comments"]
+        fields = ["id","title","start_at","end_at","content","complete","comments"]
 
 class MarkdownSerializer(serializers.ModelSerializer):
     class Meta:
