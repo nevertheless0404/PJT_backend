@@ -1,18 +1,11 @@
 from django.shortcuts import render
-from .models import Project, Todo, Informs, Members, Comment, Markdown
+from .models import Project, Todo, Informs, Members, Comment, Markdown, Notification
 from accounts.models import User
 from rest_framework.decorators import api_view
 from rest_framework import viewsets
 from rest_framework.parsers import JSONParser
 
-from .serializers import (
-    ProjectSerializer,
-    TodoSerializer,
-    InformsSerializer,
-    MembersSerializer,
-    CommentSerializer,
-    MarkdownSerializer,
-)
+from .serializers import *
 from django.contrib.auth import get_user_model
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -351,6 +344,7 @@ class Commentlist(APIView):
             serializer.validated_data["project"] = project
             serializer.validated_data["todo"] = todo
             serializer.save()  # 저장
+            Notification.objects.create(send_user=request.user, receive_user=todo.user, todo=todo, project=project)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -411,3 +405,20 @@ class Commentdetail(APIView):
         if comment.user == request.user:
             comment.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class NotificationList(APIView):
+    def get(self, request):
+        notifications = Notification.objects.filter(receive_user_id=request.user.pk, is_read=0)
+
+        serializer = NotificationSerializer(notifications, many=True)
+        return Response(serializer.data)
+
+class Isread(APIView):
+    def put(self, request, pk, format=None):
+        notification = Notification.objects.get(pk=pk)
+        notification.is_read = 1
+        notification.save()
+        serializer = NotificationSerializer(notification)
+        return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
