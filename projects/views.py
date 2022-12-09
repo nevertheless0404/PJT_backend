@@ -51,8 +51,19 @@ class Projectlist(APIView):
                 project = Project.objects.get(pk=serializer.data["id"])
                 # 멤버스 안에 만든사람 db에 저장하기
                 Members.objects.create(user=request.user, leader=1, project=project)
+                members = Members.objects.filter(project_id=serializer.data["id"])
+                members_list = ''
+                skills_list = ''
+                functions_list = ''
+                for member in members:
+                    members_list += '- ' + member.user + '\n'
+                for skill in project.skill.split(' '):
+                    skills_list += '- ' + skill + '\n'
+                for function in project.functions.split(' '):
+                    functions_list += '- ' + function + '\n'
+                print(members_list, skills_list, functions_list)
                 # Markdown 안에 프로젝트 내용 저장하기
-                content = '# ' + project.title + '\n' + '## 서비스 목표 ' + project.goal + '\n' + '## 개발 기간 ' + str(project.start_at) + ' ~ ' + str(project.end_at) + '\n' + '## 팀원 ' + '\n' + '## 기술 스택 ' + project.skill + '\n' + '## 주요 기능 ' + project.functions
+                content = '# ' + project.title + '\n' + '## 서비스 목표 ' + '\n' + project.goal + '\n' + '## 개발 기간 ' + '\n' + str(project.start_at) + '\n' + ' ~ ' + str(project.end_at) + '\n' + '## 팀원 ' + '\n' + members_list +  '\n' + '## 기술 스택 ' + '\n' + skills_list + '\n' + '## 주요 기능 ' + '\n' + functions_list
                 Markdown.objects.create(project=project, content=content)
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
 
