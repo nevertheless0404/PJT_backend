@@ -61,9 +61,8 @@ class Projectlist(APIView):
                     skills_list += '- ' + skill + '\n'
                 for function in project.functions.split(' '):
                     functions_list += '- ' + function + '\n'
-                print(members_list, skills_list, functions_list)
                 # Markdown 안에 프로젝트 내용 저장하기
-                content = '# ' + project.title + '\n' + '## 서비스 목표 ' + '\n' + project.goal + '\n' + '## 개발 기간 ' + '\n' + str(project.start_at) + '\n' + ' ~ ' + str(project.end_at) + '\n' + '## 팀원 ' + '\n' + members_list +  '\n' + '## 기술 스택 ' + '\n' + skills_list + '\n' + '## 주요 기능 ' + '\n' + functions_list
+                content = '# ' + project.title + '\n' + '## 서비스 목표 ' + '\n' + project.goal + '\n' + '## 개발 기간 ' + '\n' + str(project.start_at) + ' ~ ' + str(project.end_at) + '\n' + '## 팀원 ' + '\n' + members_list +  '\n' + '## 기술 스택 ' + '\n' + skills_list + '\n' + '## 주요 기능 ' + '\n' + functions_list
                 Markdown.objects.create(project=project, content=content)
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
 
@@ -95,6 +94,7 @@ class Projectdetail(APIView):
         serializer = ProjectSerializer(project, data=request.data)
         # 팀장인 사람만 project수정 가능
         members = Members.objects.filter(project=project.pk)
+        markdown = Markdown.objects.get(project_id=pk)
         lead = 0
         for member in members:
             if member.leader == 1:
@@ -102,6 +102,18 @@ class Projectdetail(APIView):
                 if lead.user == request.user.email:
                     if serializer.is_valid():
                         serializer.save()
+                        members_list = ''
+                        skills_list = ''
+                        functions_list = ''
+                        for member in members:
+                            members_list += '- ' + member.user + '\n'
+                        for skill in project.skill.split(' '):
+                            skills_list += '- ' + skill + '\n'
+                        for function in project.functions.split(' '):
+                            functions_list += '- ' + function + '\n'
+                        content = '# ' + project.title + '\n' + '## 서비스 목표 ' + '\n' + project.goal + '\n' + '## 개발 기간 ' + '\n' + str(project.start_at) + ' ~ ' + str(project.end_at) + '\n' + '## 팀원 ' + '\n' + members_list +  '\n' + '## 기술 스택 ' + '\n' + skills_list + '\n' + '## 주요 기능 ' + '\n' + functions_list
+                        markdown.content = content
+                        markdown.save()
                         return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -124,6 +136,14 @@ class Markdowndetail(APIView):
         markdown = Markdown.objects.get(project_id=pk)
         serializer = MarkdownSerializer(markdown)
         return Response(serializer.data)
+
+    def put(self, request, pk, format=None):
+        markdown = Markdown.objects.get(project_id=pk)
+        serializer = MarkdownSerializer(markdown, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 # 리더 권한 넘겨주기
 @api_view(["GET", "POST"])
