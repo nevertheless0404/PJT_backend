@@ -40,7 +40,7 @@ class RecentProjectSerializer(serializers.ModelSerializer):
 class InformsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Informs
-        fields = ['content']
+        fields = ['id', 'content']
 
 class MembersSerializer(serializers.ModelSerializer):
     class Meta:
