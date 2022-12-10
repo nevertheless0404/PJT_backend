@@ -56,3 +56,14 @@ class Comment(models.Model):
 class Markdown(models.Model):
     content = models.TextField()
     project = models.ForeignKey(Project, on_delete=models.CASCADE, null=True)
+
+class Notification(models.Model):
+    send_user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="send_user"
+    )
+    receive_user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="receive_user"
+    )
+    is_read = models.BooleanField(default=0)
+    todo = models.ForeignKey(Todo, related_name="noti_todo", on_delete=models.CASCADE)
+    project = models.ForeignKey(Project, related_name="noti_project", on_delete=models.CASCADE)

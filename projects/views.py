@@ -1,18 +1,11 @@
 from django.shortcuts import render
-from .models import Project, Todo, Informs, Members, Comment, Markdown
+from .models import Project, Todo, Informs, Members, Comment, Markdown, Notification
 from accounts.models import User
 from rest_framework.decorators import api_view
 from rest_framework import viewsets
 from rest_framework.parsers import JSONParser
 
-from .serializers import (
-    ProjectSerializer,
-    TodoSerializer,
-    InformsSerializer,
-    MembersSerializer,
-    CommentSerializer,
-    MarkdownSerializer,
-)
+from .serializers import *
 from django.contrib.auth import get_user_model
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -58,8 +51,19 @@ class Projectlist(APIView):
                 project = Project.objects.get(pk=serializer.data["id"])
                 # 멤버스 안에 만든사람 db에 저장하기
                 Members.objects.create(user=request.user, leader=1, project=project)
+                members = Members.objects.filter(project_id=serializer.data["id"])
+                members_list = ''
+                skills_list = ''
+                functions_list = ''
+                for member in members:
+                    members_list += '- ' + member.user + '\n'
+                for skill in project.skill.split(' '):
+                    skills_list += '- ' + skill + '\n'
+                for function in project.functions.split(' '):
+                    functions_list += '- ' + function + '\n'
+                print(members_list, skills_list, functions_list)
                 # Markdown 안에 프로젝트 내용 저장하기
-                content = '# ' + project.title + '\n' + '## 서비스 목표 ' + project.goal + '\n' + '## 개발 기간 ' + str(project.start_at) + ' ~ ' + str(project.end_at) + '\n' + '## 팀원 ' + '\n' + '## 기술 스택 ' + project.skill + '\n' + '## 주요 기능 ' + project.functions
+                content = '# ' + project.title + '\n' + '## 서비스 목표 ' + '\n' + project.goal + '\n' + '## 개발 기간 ' + '\n' + str(project.start_at) + '\n' + ' ~ ' + str(project.end_at) + '\n' + '## 팀원 ' + '\n' + members_list +  '\n' + '## 기술 스택 ' + '\n' + skills_list + '\n' + '## 주요 기능 ' + '\n' + functions_list
                 Markdown.objects.create(project=project, content=content)
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
 
@@ -145,7 +149,6 @@ def changeleader(request, project_pk, leader_pk, format=None):
         return Response("변경 성공!", status=status.HTTP_201_CREATED)
     return Response("변경 실패!", status=status.HTTP_400_BAD_REQUEST)
 
-
 # todo의 목록을 보여주는 역할
 class Todolist(APIView):
     # permissions_classes = [IsAuthenticated]
@@ -174,12 +177,10 @@ class Todolist(APIView):
                     # 할일에 프젝정보랑 유저정보 넣어줌
                     serializer.validated_data["project"] = project
                     serializer.validated_data["user"] = request.user
-                    serializer.save()  # 저장
+                    serializer.save()
                     return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
-# todo의 detail을 보여주는 역할
 class Tododetail(APIView):
     permissions_classes = [IsAuthenticated]
     # todo 객체 가져오기
@@ -358,6 +359,7 @@ class Commentlist(APIView):
             serializer.validated_data["project"] = project
             serializer.validated_data["todo"] = todo
             serializer.save()  # 저장
+            Notification.objects.create(send_user=request.user, receive_user=todo.user, todo=todo, project=project)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -418,3 +420,20 @@ class Commentdetail(APIView):
         if comment.user == request.user:
             comment.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class NotificationList(APIView):
+    def get(self, request):
+        notifications = Notification.objects.filter(receive_user_id=request.user.pk, is_read=0)
+
+        serializer = NotificationSerializer(notifications, many=True)
+        return Response(serializer.data)
+
+class Isread(APIView):
+    def put(self, request, pk, format=None):
+        notification = Notification.objects.get(pk=pk)
+        notification.is_read = 1
+        notification.save()
+        serializer = NotificationSerializer(notification)
+        return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
