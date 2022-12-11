@@ -204,13 +204,14 @@ def changeleader(request, project_pk, leader_pk, format=None):
             if member.leader == 1:
                 nowleader = member
                 break
-        print(nowleader)
+        member = Members.objects.get(pk=leader_pk)
+        user = User.objects.get(email=member.user)
         # 현재 리더와 로그인한 유저가 같으면
         if request.user.email == nowleader.user:
             # 유저정보를 가져온다
-            newnew = User.objects.get(pk=leader_pk)
+            newleader_tmp = User.objects.get(pk=user.pk)
             for member in members:
-                if member.user == newnew.email:
+                if member.user == newleader_tmp.email:
                     newleader = member
             newleader.leader = 1
             newleader.save()
