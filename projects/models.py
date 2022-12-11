@@ -12,6 +12,7 @@ class Project(models.Model):
     goal = models.CharField(max_length=50)
     skill = models.TextField()
     functions = models.TextField()
+    color = models.IntegerField(default=0)
 
 
 class Todo(models.Model):
