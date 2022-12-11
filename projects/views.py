@@ -161,7 +161,10 @@ def changeleader(request, project_pk, leader_pk, format=None):
         # 현재 리더와 로그인한 유저가 같으면
         if request.user.email == nowleader.user:
             # 유저정보를 가져온다
-            newleader = Members.objects.get(pk=leader_pk)
+            newnew = User.objects.get(pk=leader_pk)
+            for member in members:
+                if member.user == newnew.email:
+                    newleader = member
             newleader.leader = 1
             newleader.save()
             nowleader.leader = 0
