@@ -81,7 +81,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('comment', models.CharField(max_length=100)),
-                ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='생성시간')),
+                ('created_at', models.DateField(auto_now_add=True, verbose_name='생성시간')),
                 ('parent', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='reply', to='projects.comment')),
                 ('project', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='projects.project')),
                 ('todo', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='comments', to='projects.todo')),

@@ -52,7 +52,7 @@ class Comment(models.Model):
         "self", related_name="reply", on_delete=models.CASCADE, null=True, blank=True
     )
     comment = models.CharField(max_length=100)
-    created_at = models.DateTimeField("생성시간", auto_now_add=True)
+    created_at = models.DateField("생성시간", auto_now_add=True)
 
 class Markdown(models.Model):
     content = models.TextField()
