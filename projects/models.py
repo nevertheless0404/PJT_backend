@@ -24,8 +24,8 @@ class Todo(models.Model):
     project = models.ForeignKey(
         Project, on_delete=models.CASCADE, related_name="todo_project"
     )
-    start_at = models.DateTimeField()
-    end_at = models.DateTimeField()
+    start_at = models.DateField()
+    end_at = models.DateField()
     complete = models.IntegerField(default=0)
 
 
@@ -54,5 +54,17 @@ class Comment(models.Model):
     comment = models.CharField(max_length=100)
     created_at = models.DateTimeField("생성시간", auto_now_add=True)
 
+class Markdown(models.Model):
+    content = models.TextField()
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, null=True)
 
-#
+class Notification(models.Model):
+    send_user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="send_user"
+    )
+    receive_user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="receive_user"
+    )
+    is_read = models.BooleanField(default=0)
+    todo = models.ForeignKey(Todo, related_name="noti_todo", on_delete=models.CASCADE)
+    project = models.ForeignKey(Project, related_name="noti_project", on_delete=models.CASCADE)

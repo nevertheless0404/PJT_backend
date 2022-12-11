@@ -29,11 +29,12 @@ def google_callback(request):
     client_id =  os.getenv("SOCIAL_AUTH_GOOGLE_CLIENT_ID")
     client_secret = os.getenv("SOCIAL_AUTH_GOOGLE_SECRET")
     code = request.GET.get('code')
+    GOOGLE_CALLBACK_URI_FRONT = "http://localhost:8080/google/callback/"
     """
     Access Token Request
     """
     token_req = requests.post(
-        f"https://oauth2.googleapis.com/token?client_id={client_id}&client_secret={client_secret}&code={code}&grant_type=authorization_code&redirect_uri={GOOGLE_CALLBACK_URI}&state={state}")
+        f"https://oauth2.googleapis.com/token?client_id={client_id}&client_secret={client_secret}&code={code}&grant_type=authorization_code&redirect_uri={GOOGLE_CALLBACK_URI_FRONT}&state={state}")
     token_req_json = token_req.json()
     error = token_req_json.get("error")
     if error is not None:
@@ -74,6 +75,7 @@ def google_callback(request):
     except User.DoesNotExist:
         # 기존에 가입된 유저가 없으면 새로 가입
         data = {'access_token': access_token, 'code': code}
+        print(data)
         accept = requests.post(
             f"{BASE_URL}api/accounts/v1/google/login/finish/", data=data)
         accept_status = accept.status_code
