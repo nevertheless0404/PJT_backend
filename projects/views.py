@@ -239,6 +239,7 @@ class Todolist(APIView):
 
     # 새로운 todo 글을 작성할 때
     def post(self, request, project_pk):
+        print('todotodotodotodto', request, request.user)
         project = Project.objects.get(pk=project_pk)
         serializer = TodoSerializer(data=request.data)
         # 프젝에 있는 멤버
@@ -338,7 +339,6 @@ class Informsdetail(APIView):
         return Response(serializer.data)
 
     def put(self, request, pk, format=None):
-        print(request)
         inform = Informs.objects.get(project_id=pk)
         serializer = InformsSerializer(inform, data=request.data)
         print(serializer)
@@ -361,23 +361,22 @@ class Membersadm(APIView):
         return Response(serializer.data)
 
     def post(self, request, pk):
-        project = Project.objects.get(pk=pk)
-        members = Members.objects.filter(project_id=pk)
-        mememail = []
-        for member in members:
-            mememail.append(member.user)
-        email = request.data["user"].split(" ")
-        for i in email:
-            dict_ = {"user": ""}
-            dict_["user"] = i
-            if i not in mememail:
-                serializer = MembersSerializer(data=dict_)
-                if serializer.is_valid():
-                    serializer.validated_data["project"] = project
-                    serializer.save()
-            else:
-                continue
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        print(request.user)
+        teamleader = 0
+        leaders = Members.objects.filter(project=pk)
+        for lead in leaders:
+            if lead.leader == 1:
+                teamleader = lead
+                print(lead)
+                break
+        if request.user.email == lead.user:
+            serializer = MembersSerializer(data=request.data)
+            project = Project.objects.get(pk=pk)
+            if serializer.is_valid():
+                serializer.validated_data["project"] = project
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class Membersadmdetail(APIView):
@@ -386,19 +385,6 @@ class Membersadmdetail(APIView):
             return Members.objects.get(pk=pk)
         except Members.DoesNotExist:
             raise Http404
-
-    def get(self, request, project_pk, pk, format=None):
-        member = self.get_object(project_pk, pk)
-        serializer = MembersSerializer(member)
-        return Response(serializer.data)
-
-    def put(self, request, pk, format=None):
-        member = self.get_object(pk)
-        serializer = MembersSerializer(member, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.error, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, project_pk, pk, format=None):
         member = self.get_object(project_pk, pk)
@@ -411,7 +397,6 @@ class Membersadmdetail(APIView):
                     dele = True
         if str(member.user) == str(request.user):
             dele = True
-        print(dele)
         if dele == True:
             if member.leader == 0:
                 member.delete()
