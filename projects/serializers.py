@@ -19,7 +19,7 @@ class ProjectSerializer(serializers.ModelSerializer):
     comments = CommentSerializer(read_only=True, many=True)
     class Meta:
         model = Project
-        fields = ["id","title","start_at","end_at","goal","skill","functions", "todo_project", "comments"]
+        fields = ["id","title","start_at","end_at","goal","skill","functions", "todo_project", "comments", "color"]
 
 class RecentProjectSerializer(serializers.ModelSerializer):
     class Meta:

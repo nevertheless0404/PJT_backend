@@ -4,7 +4,7 @@ from accounts.models import User
 from rest_framework.decorators import api_view
 from rest_framework import viewsets
 from rest_framework.parsers import JSONParser
-
+import random
 from .serializers import (
     ProjectSerializer,
     TodoSerializer,
@@ -53,6 +53,8 @@ class Projectlist(APIView):
             if serializer.is_valid():  # 유효성 검사
                 # 유저 추가해주기
                 serializer.validated_data["user"] = request.user
+                x = random.randrange(1,4)
+                serializer.validated_data["color"] = x
                 serializer.save()  # 저장
                 project = Project.objects.get(pk=serializer.data["id"])
                 # 멤버스 안에 만든사람 db에 저장하기
@@ -124,10 +126,15 @@ def changeleader(request, project_pk, leader_pk, format=None):
             if member.leader == 1:
                 nowleader = member
                 break
+        print(nowleader)
         # 현재 리더와 로그인한 유저가 같으면
         if request.user.email == nowleader.user:
             # 유저정보를 가져온다
-            newleader = Members.objects.get(pk=leader_pk)
+            newleaders = Members.objects.filter(project=project_pk)
+            newnew = User.objects.get(pk=leader_pk)
+            for newjeans in newleaders:
+                if newjeans.user == newnew.user.email:
+                    newleader = newjeans
             newleader.leader = 1
             newleader.save()
             nowleader.leader = 0
