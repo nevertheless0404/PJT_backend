@@ -47,7 +47,7 @@ class Projectlist(APIView):
             if serializer.is_valid():  # 유효성 검사
                 # 유저 추가해주기
                 serializer.validated_data["user"] = request.user
-                x = random.randrange(1,4)
+                x = random.randrange(1, 4)
                 serializer.validated_data["color"] = x
                 serializer.save()  # 저장
                 project = Project.objects.get(pk=serializer.data["id"])

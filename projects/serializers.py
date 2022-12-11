@@ -2,35 +2,62 @@ from .models import Project, Todo, Informs, Members, Comment, Markdown, Notifica
 from rest_framework import serializers
 from accounts.models import User
 
+
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = '__all__'
+        fields = "__all__"
+
 
 class CommentSerializer(serializers.ModelSerializer):
     user = serializers.ReadOnlyField(source="user.email")
     todo = serializers.ReadOnlyField(source="todo.pk")
+
     class Meta:
         model = Comment
-        fields = '__all__'
+        fields = "__all__"
+
 
 class TodoSerializer(serializers.ModelSerializer):
+    user = serializers.ReadOnlyField(source="user.email")
     comments = CommentSerializer(read_only=True, many=True)
+
     class Meta:
         model = Todo
-        fields = ["id","title","start_at","end_at","content", "complete", "comments"]
+        fields = [
+            "id",
+            "title",
+            "start_at",
+            "end_at",
+            "content",
+            "complete",
+            "user",
+            "comments",
+        ]
+
 
 class MarkdownSerializer(serializers.ModelSerializer):
     class Meta:
         model = Markdown
         fields = ["project", "content"]
 
+
 class ProjectSerializer(serializers.ModelSerializer):
     user_id = serializers.ReadOnlyField()
 
     class Meta:
         model = Project
-        fields = ["id","title","start_at","end_at","goal","skill","functions", "user_id", "color"]
+        fields = [
+            "id",
+            "title",
+            "start_at",
+            "end_at",
+            "goal",
+            "skill",
+            "functions",
+            "color",
+            "user_id",
+        ]
 
 
 class RecentProjectSerializer(serializers.ModelSerializer):
@@ -38,10 +65,12 @@ class RecentProjectSerializer(serializers.ModelSerializer):
         model = Project
         fields = ["id"]
 
+
 class InformsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Informs
-        fields = ['id', 'content']
+        fields = ["id", "content"]
+
 
 class MembersSerializer(serializers.ModelSerializer):
     class Meta:
@@ -57,4 +86,4 @@ class NotificationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Notification
-        fields = '__all__'
+        fields = "__all__"
