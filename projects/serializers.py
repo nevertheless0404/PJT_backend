@@ -45,7 +45,7 @@ class InformsSerializer(serializers.ModelSerializer):
 class MembersSerializer(serializers.ModelSerializer):
     class Meta:
         model = Members
-        fields = ['id','user', 'leader']
+        fields = '__all__'
 
 class NotificationSerializer(serializers.ModelSerializer):
     send_user = UserSerializer(read_only=True)
