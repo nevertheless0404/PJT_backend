@@ -5,13 +5,7 @@ from rest_framework.decorators import api_view
 from rest_framework import viewsets
 from rest_framework.parsers import JSONParser
 import random
-from .serializers import (
-    ProjectSerializer,
-    TodoSerializer,
-    InformsSerializer,
-    MembersSerializer,
-    CommentSerializer,
-)
+from .serializers import *
 from django.contrib.auth import get_user_model
 from rest_framework.views import APIView
 from rest_framework.response import Response

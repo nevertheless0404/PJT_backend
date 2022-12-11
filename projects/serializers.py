@@ -30,7 +30,7 @@ class ProjectSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Project
-        fields = ["id","title","start_at","end_at","goal","skill","functions", "todo_project", "comments", "color"]
+        fields = ["id","title","start_at","end_at","goal","skill","functions", "user_id", "color"]
 
 
 class RecentProjectSerializer(serializers.ModelSerializer):
