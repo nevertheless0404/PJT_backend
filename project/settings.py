@@ -119,6 +119,7 @@ CORS_ORIGIN_WHITELIST = [
     "http://192.168.0.6:8080",
     "http://172.30.1.40:8080",
     "http://172.30.1.22:8080",
+    "https://pjt.vercel.app"
 ]
 
 ROOT_URLCONF = "project.urls"

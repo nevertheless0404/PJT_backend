@@ -512,3 +512,10 @@ class Isread(APIView):
         serializer = NotificationSerializer(notification)
         return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class Userlist(APIView):
+    def get(self, request):
+        users = User.objects.all()
+
+        serializer = UserSerializer(users, many=True)
+        return Response(serializer.data)
