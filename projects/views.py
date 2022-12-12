@@ -514,8 +514,9 @@ class Isread(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class Userlist(APIView):
-    def get(self, request):
-        users = User.objects.all()
+    def get(self, request, word):
+
+        users = User.objects.filter(email__contains=word)
 
         serializer = UserSerializer(users, many=True)
         return Response(serializer.data)
