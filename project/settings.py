@@ -33,6 +33,7 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 
 ALLOWED_HOSTS = [
     # "Elastic Beanstalk URL",
+    "pjtpjt.tk",
     "Pjt-env-1.eba-gts2sgmb.ap-northeast-2.elasticbeanstalk.com",  # 예시입니다. 본인 URL로 해주세요.
     "127.0.0.1",
     "localhost",
