@@ -47,8 +47,7 @@ class Projectlist(APIView):
             if serializer.is_valid():  # 유효성 검사
                 # 유저 추가해주기
                 serializer.validated_data["user"] = request.user
-                x = random.randrange(1, 4)
-                serializer.validated_data["color"] = x
+                serializer.validated_data["color"] = random.randrange(1, 4)
                 serializer.save()  # 저장
                 project = Project.objects.get(pk=serializer.data["id"])
                 # 멤버스 안에 만든사람 db에 저장하기
@@ -92,7 +91,6 @@ class Projectlist(APIView):
                 )
                 Markdown.objects.create(project=project, content=content)
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
-
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -511,10 +509,17 @@ class NotificationList(APIView):
         serializer = NotificationSerializer(notifications, many=True)
         return Response(serializer.data)
 
+class NotificationTodo(APIView):
+    def get(self, request, pk):
+        todo = Todo.objects.get(pk=pk)
+
+        serializer = TodoSerializer(todo)
+        return Response(serializer.data)
 
 class Isread(APIView):
     def put(self, request, pk, format=None):
         notification = Notification.objects.get(pk=pk)
+        print(notification)
         notification.is_read = 1
         notification.save()
         serializer = NotificationSerializer(notification)
