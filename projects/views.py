@@ -190,6 +190,14 @@ class Markdowndetail(APIView):
         serializer = MarkdownSerializer(markdown)
         return Response(serializer.data)
 
+    def put(self, request, pk, format=None):
+        markdown = Markdown.objects.get(project_id=pk)
+        serializer = MarkdownSerializer(markdown, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 # 리더 권한 넘겨주기
 @api_view(["GET", "POST"])
@@ -239,7 +247,7 @@ class Todolist(APIView):
 
     # 새로운 todo 글을 작성할 때
     def post(self, request, project_pk):
-        print('todotodotodotodto', request, request.user)
+        print("todotodotodotodto", request, request.user)
         project = Project.objects.get(pk=project_pk)
         serializer = TodoSerializer(data=request.data)
         # 프젝에 있는 멤버
@@ -512,6 +520,7 @@ class Isread(APIView):
         serializer = NotificationSerializer(notification)
         return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class Userlist(APIView):
     def get(self, request, word):
