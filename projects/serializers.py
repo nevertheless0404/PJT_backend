@@ -17,31 +17,6 @@ class CommentSerializer(serializers.ModelSerializer):
         model = Comment
         fields = "__all__"
 
-
-class TodoSerializer(serializers.ModelSerializer):
-    user = serializers.ReadOnlyField(source="user.email")
-    comments = CommentSerializer(read_only=True, many=True)
-
-    class Meta:
-        model = Todo
-        fields = [
-            "id",
-            "title",
-            "start_at",
-            "end_at",
-            "content",
-            "complete",
-            "user",
-            "comments",
-        ]
-
-
-class MarkdownSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Markdown
-        fields = ["project", "content"]
-
-
 class ProjectSerializer(serializers.ModelSerializer):
     user_id = serializers.ReadOnlyField()
 
@@ -58,6 +33,32 @@ class ProjectSerializer(serializers.ModelSerializer):
             "color",
             "user_id",
         ]
+
+class TodoSerializer(serializers.ModelSerializer):
+    user = serializers.ReadOnlyField(source="user.email")
+    comments = CommentSerializer(read_only=True, many=True)
+    project = serializers.ReadOnlyField(source="project.title")
+    class Meta:
+        model = Todo
+        fields = [
+            "project",
+            "id",
+            "title",
+            "start_at",
+            "end_at",
+            "content",
+            "complete",
+            "user",
+            "comments"
+        ]
+
+
+class MarkdownSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Markdown
+        fields = ["project", "content"]
+
+
 
 
 class RecentProjectSerializer(serializers.ModelSerializer):
