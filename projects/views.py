@@ -113,7 +113,7 @@ class Projectdetail(APIView):
         for member in members:
             if member.user == request.user.email:
                 serializer = ProjectSerializer(project)
-            return Response(serializer.data)
+                return Response(serializer.data)
 
     # project 수정하기
     def put(self, request, pk, format=None):
