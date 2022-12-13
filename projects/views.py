@@ -59,9 +59,9 @@ class Projectlist(APIView):
                 functions_list = ""
                 for member in members:
                     members_list += "- " + member.user + "\n"
-                for skill in project.skill.split(" "):
+                for skill in project.skill.split(";"):
                     skills_list += "- " + skill + "\n"
-                for function in project.functions.split(" "):
+                for function in project.functions.split(";"):
                     functions_list += "- " + function + "\n"
                 # Markdown 안에 프로젝트 내용 저장하기
                 content = (
@@ -134,9 +134,9 @@ class Projectdetail(APIView):
                         functions_list = ""
                         for member in members:
                             members_list += "- " + member.user + "\n"
-                        for skill in project.skill.split(" "):
+                        for skill in project.skill.split(";"):
                             skills_list += "- " + skill + "\n"
-                        for function in project.functions.split(" "):
+                        for function in project.functions.split(";"):
                             functions_list += "- " + function + "\n"
                         content = (
                             "# "
