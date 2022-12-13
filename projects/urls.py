@@ -32,6 +32,7 @@ urlpatterns = [
     path("changeleader/<int:project_pk>/<int:leader_pk>/", views.changeleader),
     path("<int:pk>/markdown/", views.Markdowndetail.as_view()),
     path("notification/", views.NotificationList.as_view()),
+    path("notification/<int:pk>", views.NotificationTodo.as_view()),
     path("isread/<int:pk>/", views.Isread.as_view()),
     path("userlist/<str:word>", views.Userlist.as_view())
 ]
