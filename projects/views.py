@@ -231,6 +231,20 @@ def changeleader(request, project_pk, leader_pk, format=None):
         return Response("변경 성공!", status=status.HTTP_201_CREATED)
     return Response("변경 실패!", status=status.HTTP_400_BAD_REQUEST)
 
+class Todolistfilter(APIView):
+    # permissions_classes = [IsAuthenticated]
+    # todo list를 보여줄 때
+    def get(self, request, project_pk):
+        project = Project.objects.get(pk=project_pk)
+        # 프젝에 있는 유저면 볼 수 있음
+        members = Members.objects.filter(project=project)
+        for member in members:
+            if request.user.email == member.user:
+                # 그 프젝의 할 일만 나옴
+                todos = Todo.objects.filter(project_id=project_pk, user_id=request.user)
+                serializer = TodoSerializer(todos, many=True)
+                return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 # todo의 목록을 보여주는 역할
 class Todolist(APIView):
