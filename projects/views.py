@@ -367,22 +367,27 @@ class Membersadm(APIView):
         return Response(serializer.data)
 
     def post(self, request, pk):
-        print(request.user)
         teamleader = 0
         leaders = Members.objects.filter(project=pk)
+        users = User.objects.all()
+        user_list = []
+        for user in users:
+            user_list.append(user.email)
+        print(user_list)
         for lead in leaders:
             if lead.leader == 1:
                 teamleader = lead
-                print(lead)
                 break
-        if request.user.email == lead.user:
-            serializer = MembersSerializer(data=request.data)
-            project = Project.objects.get(pk=pk)
-            if serializer.is_valid():
-                serializer.validated_data["project"] = project
-                serializer.save()
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        print(request.data['user'])
+        if str(request.data['user']) in user_list:
+            if request.user.email == lead.user:
+                serializer = MembersSerializer(data=request.data)
+                project = Project.objects.get(pk=pk)
+                if serializer.is_valid():
+                    serializer.validated_data["project"] = project
+                    serializer.save()
+                    return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class Membersadmdetail(APIView):
