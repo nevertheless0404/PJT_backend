@@ -16,7 +16,7 @@ load_dotenv()
 
 
 state = os.getenv("STATE")
-BASE_URL = 'http://localhost:8000/'
+BASE_URL = 'https://pjtpjt.tk/'
 GOOGLE_CALLBACK_URI = BASE_URL + 'api/accounts/v1/google/callback/'
 def google_login(request):
     """
@@ -29,7 +29,7 @@ def google_callback(request):
     client_id =  os.getenv("SOCIAL_AUTH_GOOGLE_CLIENT_ID")
     client_secret = os.getenv("SOCIAL_AUTH_GOOGLE_SECRET")
     code = request.GET.get('code')
-    GOOGLE_CALLBACK_URI_FRONT = "http://localhost:8080/google/callback/"
+    GOOGLE_CALLBACK_URI_FRONT = "https://pjt.vercel.app/google/callback/"
     """
     Access Token Request
     """
