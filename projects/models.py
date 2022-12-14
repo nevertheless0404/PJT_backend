@@ -30,7 +30,7 @@ class Todo(models.Model):
 
 
 class Informs(models.Model):
-    content = models.CharField(max_length=150)
+    content = models.CharField(max_length=150, null=True, blank=True)
     project = models.ForeignKey(
         Project, on_delete=models.CASCADE, related_name="info_project"
     )
@@ -54,9 +54,11 @@ class Comment(models.Model):
     comment = models.CharField(max_length=100)
     created_at = models.DateField("생성시간", auto_now_add=True)
 
+
 class Markdown(models.Model):
     content = models.TextField()
     project = models.ForeignKey(Project, on_delete=models.CASCADE, null=True)
+
 
 class Notification(models.Model):
     send_user = models.ForeignKey(
@@ -67,4 +69,6 @@ class Notification(models.Model):
     )
     is_read = models.BooleanField(default=0)
     todo = models.ForeignKey(Todo, related_name="noti_todo", on_delete=models.CASCADE)
-    project = models.ForeignKey(Project, related_name="noti_project", on_delete=models.CASCADE)
+    project = models.ForeignKey(
+        Project, related_name="noti_project", on_delete=models.CASCADE
+    )
