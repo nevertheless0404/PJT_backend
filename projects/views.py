@@ -223,6 +223,11 @@ def changeleader(request, project_pk, leader_pk, format=None):
             newleader.save()
             nowleader.leader = 0
             nowleader.save()
+        users = User.objects.get(email=newleader.user)
+        pro = Project.objects.get(pk=project_pk)
+        pro.user = users
+        pro.save()
+
         return Response("변경 성공!", status=status.HTTP_201_CREATED)
     return Response("변경 실패!", status=status.HTTP_400_BAD_REQUEST)
 
