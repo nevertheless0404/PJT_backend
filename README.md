@@ -14,11 +14,9 @@
 
 <br>
 
-## 웹사이트 주소
+## 배포 주소
 
-👉🏻 https://pjt.vercel.app/
-
-![](https://velog.velcdn.com/images/hvvany/post/65a4d6b7-38eb-4603-a809-a061e8da0ae0/image.png)
+👉🏻 https://pjtpjt.tk/
 
 <br>
 
@@ -41,7 +39,7 @@
 
 ## 백엔드
 
-![](https://img.shields.io/badge/Django-092E20?style=for-the-badge&logo=django&logoColor=green)![](https://img.shields.io/badge/django%20rest-ff1709?style=for-the-badge&logo=django&logoColor=white)![](https://img.shields.io/badge/Amazon_AWS-FF9900?style=for-the-badge&logo=amazonaws&logoColor=white)
+![](https://img.shields.io/badge/Django-092E20?style=for-the-badge&logo=django&logoColor=green)![](https://img.shields.io/badge/django%20rest-ff1709?style=for-the-badge&logo=django&logoColor=white)![](https://img.shields.io/badge/Amazon_AWS-232F3E?style=for-the-badge&logo=amazonaws&logoColor=white)![](https://img.shields.io/badge/Amazon_S3-569A31?style=for-the-badge&logo=amazons3&logoColor=white)![](https://img.shields.io/badge/Amazon_RDS-527FFF?style=for-the-badge&logo=amazonrds&logoColor=white)
 
 ## 데이터 베이스
 
@@ -71,21 +69,6 @@
 
 <br>
 
-# 프로젝트 구성
-
-## 템플릿 구성도 ( Figma )
-
-![](https://velog.velcdn.com/images/hvvany/post/df9baa80-4262-4a34-ba5d-75c5e398b7b7/image.png)
-![](https://velog.velcdn.com/images/hvvany/post/99cc27bd-71d3-42b3-9bc9-b8e4c8772a3c/image.png)
-![](https://velog.velcdn.com/images/hvvany/post/2568a21a-3ea2-465f-9281-6a6c8189a143/image.png)
-
----
-
-## 모델 구성도 ( ERDCloud )
-
-![](https://velog.velcdn.com/images/hvvany/post/e5b48099-11ee-4ce8-a0b6-53673df57c60/image.png)
-
-<br>
 
 # 서비스 소개
 
@@ -99,63 +82,6 @@
 - 프로젝트별 공지사항
 - 인사이트 UI
 
-<br>
-
-## 로그인 페이지 & 메인 페이지
-
-![](https://velog.velcdn.com/images/hvvany/post/66f65340-a644-4038-b566-b534629e3cb5/image.gif)
-
-> `로그인 페이지`에서 프론트엔드와 백엔드에서 데이터를 처리하여 오류 메시지를 띄워준다. 로그인 실패하면 로켓이 폭발!!!
-
-> 로그인 하면 `메인 페이지`로 이동한다. 나의 모든 프로젝트 일정이 캘린더에 보인다.
-> 캘린더 우측에는 `P to J progress_bar`를 만들어 나의 일정 완료율을 볼 수 있다. 계획대로 잘 진행이 된다면 J에 좀 더 가까워 질 수 있다.
-
-> 내가 미완료한 일들을 `To Do List`에서 확인할 수 있고 `Project` 항목에서 나의 프로젝트 목록을 볼 수 있다.
-
-<br>
-<br>
-
-## 캘린더
-
-![](https://velog.velcdn.com/images/hvvany/post/d80db794-0c1a-47e8-872a-0fee6282ad3f/image.png)
-
-> 메인 페이지와 프로젝트 디테일 페이지에 캘린더를 넣어 직관적이게 볼 수 있다.
-
-<br>
-<br>
-
-## 프로젝트 디테일( 칸반 드래그 + 댓글)
-
-![](https://velog.velcdn.com/images/hvvany/post/e4187f8b-5c82-4bc6-be31-3edd1a8b500e/image.gif)
-
-> 프로젝트 목록에서 하나를 클릭하면 해당 프로젝트의 `디테일 페이지`로 이동할 수 있다.
-
-> `칸반 보드`를 통해 할 일 목록을 관리할 수 있다. `드래그 앤 드롭` 방식으로 카드를 옮기면 자동으로 상태가 변하고 `캘린더`에 반영이 된다.
-
-> 카드를 클릭하면 `상세 정보`를 볼 수 있고 내용 수정 및 댓글을 달 수 있다. `댓글`을 통해 팀원들과 소통을 하여 효율적인 프로젝트 진행이 가능하다
-
-<br>
-<br>
-
-## 마크다운 생성
-
-![](https://velog.velcdn.com/images/hvvany/post/d9d2c53f-3ff4-46d9-997f-4f6e7024d211/image.gif)
-
-> PJT를 사용하다 보면 자연스럽게 README.md의 작성이 완료됩니다.
-
-<br>
-<br>
-
-## 모바일 대응
-![](https://velog.velcdn.com/images/hvvany/post/2c46315c-cea4-43f9-b643-a608b7ae6e9e/image.png)
-
-![](https://velog.velcdn.com/images/hvvany/post/c5f762d2-5ec7-467c-8e8d-4d50b278b305/image.png)
-
-![](https://velog.velcdn.com/images/hvvany/post/ad0e2697-fe84-4ec3-bb0a-943b69ac0b40/image.png)
-
-> 모바일 반응형도 구현을 하여 대응을 하였다. 언제 어디서나 일정을 확인/ 관리할 수 있는 서비스 PJT 입니다.
-
-<br>
 <br>
 
 ## 개발 이슈
