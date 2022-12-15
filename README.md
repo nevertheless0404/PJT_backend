@@ -146,6 +146,18 @@
 <br>
 <br>
 
+## 모바일 대응
+![](https://velog.velcdn.com/images/hvvany/post/2c46315c-cea4-43f9-b643-a608b7ae6e9e/image.png)
+
+![](https://velog.velcdn.com/images/hvvany/post/c5f762d2-5ec7-467c-8e8d-4d50b278b305/image.png)
+
+![](https://velog.velcdn.com/images/hvvany/post/ad0e2697-fe84-4ec3-bb0a-943b69ac0b40/image.png)
+
+> 모바일 반응형도 구현을 하여 대응을 하였다. 언제 어디서나 일정을 확인/ 관리할 수 있는 서비스 PJT 입니다.
+
+<br>
+<br>
+
 ## 개발 이슈
 
 ![](https://velog.velcdn.com/images/hvvany/post/d4191896-9da1-4eb4-beeb-1ab7d0738131/image.png)
@@ -497,17 +509,6 @@ False로 되어있어서 안된거임
 서버 True False 설정 확인!!!
 
 푸쉬 하고 풀 당기고 하다보니 누군가가 DEBUG = False 로 해놓으면 갑자기 로컬 서버가 아닌 배포 서버로 데이터가 간다. 항상 잘 확인하자..!
-
-<br>
-<br>
-
-## 모바일 대응
-
-![](https://velog.velcdn.com/images/hvvany/post/3c8dec6f-713d-442b-8b7c-b6ef00a3885e/image.jpeg)![](https://velog.velcdn.com/images/hvvany/post/6bf3fb9c-a0c4-4660-9f31-8c64082fc426/image.jpeg)
-![](https://velog.velcdn.com/images/hvvany/post/afc822f0-00f1-4cf6-8180-c58df81ed7af/image.jpeg)![](https://velog.velcdn.com/images/hvvany/post/c9ea11f7-6dd0-4654-b1fc-52fb3df81300/image.jpeg)
-![](https://velog.velcdn.com/images/hvvany/post/806638e5-80a8-40f3-a084-b8dba95bb590/image.jpeg)
-
-> 모바일 반응형도 구현을 하여 대응을 하였다. 언제 어디서나 일정을 확인/ 관리할 수 있는 서비스 PJT 입니다.
 
 <br>
 <br>
