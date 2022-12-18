@@ -223,9 +223,28 @@ def changeleader(request, project_pk, leader_pk, format=None):
             newleader.save()
             nowleader.leader = 0
             nowleader.save()
+        users = User.objects.get(email=newleader.user)
+        pro = Project.objects.get(pk=project_pk)
+        pro.user = users
+        pro.save()
+
         return Response("변경 성공!", status=status.HTTP_201_CREATED)
     return Response("변경 실패!", status=status.HTTP_400_BAD_REQUEST)
 
+class Todolistfilter(APIView):
+    # permissions_classes = [IsAuthenticated]
+    # todo list를 보여줄 때
+    def get(self, request, project_pk):
+        project = Project.objects.get(pk=project_pk)
+        # 프젝에 있는 유저면 볼 수 있음
+        members = Members.objects.filter(project=project)
+        for member in members:
+            if request.user.email == member.user:
+                # 그 프젝의 할 일만 나옴
+                todos = Todo.objects.filter(project_id=project_pk, user_id=request.user)
+                serializer = TodoSerializer(todos, many=True)
+                return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 # todo의 목록을 보여주는 역할
 class Todolist(APIView):
@@ -367,22 +386,27 @@ class Membersadm(APIView):
         return Response(serializer.data)
 
     def post(self, request, pk):
-        print(request.user)
         teamleader = 0
         leaders = Members.objects.filter(project=pk)
+        users = User.objects.all()
+        user_list = []
+        for user in users:
+            user_list.append(user.email)
+        print(user_list)
         for lead in leaders:
             if lead.leader == 1:
                 teamleader = lead
-                print(lead)
                 break
-        if request.user.email == lead.user:
-            serializer = MembersSerializer(data=request.data)
-            project = Project.objects.get(pk=pk)
-            if serializer.is_valid():
-                serializer.validated_data["project"] = project
-                serializer.save()
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        print(request.data['user'])
+        if str(request.data['user']) in user_list:
+            if request.user.email == lead.user:
+                serializer = MembersSerializer(data=request.data)
+                project = Project.objects.get(pk=pk)
+                if serializer.is_valid():
+                    serializer.validated_data["project"] = project
+                    serializer.save()
+                    return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class Membersadmdetail(APIView):
